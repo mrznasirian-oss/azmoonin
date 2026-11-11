@@ -1,0 +1,2109 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>آزمونینو | سامانه فرم‌ساز و آزمون‌ساز</title>
+  <style>
+    :root {
+      --p: #2563eb; --ph: #1d4ed8; --pl: #dbeafe;
+      --ok: #059669; --warn: #d97706; --err: #dc2626;
+      --bg: #f1f5f9; --card: #fff; --side: #0f172a;
+      --t: #0f172a; --t2: #475569; --mu: #94a3b8; --bd: #e2e8f0;
+      --r: 12px; --sh: 0 4px 16px rgba(15,23,42,.08);
+      --f: Tahoma, Arial, system-ui, sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: var(--f); background: var(--bg); color: var(--t); line-height: 1.65; min-height: 100vh; }
+    button, input, select, textarea { font-family: inherit; font-size: 14px; }
+    .hidden { display: none !important; }
+    #auth {
+      min-height: 100vh; display: flex; align-items: center; justify-content: center;
+      background: linear-gradient(145deg, #0f172a, #1e3a5f 50%, #0f172a); padding: 20px;
+    }
+    .auth-box {
+      background: #fff; border-radius: 20px; padding: 36px 32px; width: 100%; max-width: 400px;
+      box-shadow: 0 24px 48px rgba(0,0,0,.35);
+    }
+    .auth-logo { text-align: center; margin-bottom: 24px; }
+    .auth-logo .m {
+      width: 52px; height: 52px; margin: 0 auto 10px; border-radius: 14px;
+      background: linear-gradient(135deg, #2563eb, #7c3aed); color: #fff;
+      display: grid; place-items: center; font-size: 24px; font-weight: 800;
+    }
+    .auth-logo h1 { font-size: 22px; font-weight: 800; }
+    .auth-logo p { color: var(--t2); font-size: 13px; margin-top: 4px; }
+    .fg { margin-bottom: 14px; }
+    .fg label { display: block; font-size: 13px; font-weight: 500; color: var(--t2); margin-bottom: 5px; }
+    .fg input, .fg select, .fg textarea {
+      width: 100%; padding: 11px 13px; border: 1px solid var(--bd); border-radius: 10px; outline: none;
+    }
+    .fg input:focus, .fg select:focus, .fg textarea:focus {
+      border-color: var(--p); box-shadow: 0 0 0 3px var(--pl);
+    }
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+      padding: 11px 18px; border-radius: 10px; font-weight: 600; border: none; cursor: pointer;
+      transition: .15s;
+    }
+    .btn:disabled { opacity: .55; cursor: not-allowed; }
+    .btn-p { background: var(--p); color: #fff; width: 100%; }
+    .btn-p:hover:not(:disabled) { background: var(--ph); }
+    .btn-s { background: #fff; color: var(--t); border: 1px solid var(--bd); }
+    .btn-s:hover { background: var(--bg); }
+    .btn-d { background: var(--err); color: #fff; }
+    .btn-sm { padding: 7px 12px; font-size: 13px; width: auto; }
+    .auth-err {
+      background: #fef2f2; color: #b91c1c; padding: 10px 12px; border-radius: 8px;
+      font-size: 13px; margin-bottom: 14px; display: none;
+    }
+    .auth-err.on { display: block; }
+    .auth-sw { text-align: center; margin-top: 16px; font-size: 13px; color: var(--t2); }
+    .auth-sw a { color: var(--p); font-weight: 600; cursor: pointer; }
+    #app { display: none; min-height: 100vh; }
+    #app.on { display: flex; }
+    .side {
+      width: 250px; background: var(--side); color: #e2e8f0;
+      position: fixed; top: 0; right: 0; bottom: 0; z-index: 40;
+      display: flex; flex-direction: column; transition: transform .2s;
+    }
+    .side-h { padding: 18px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #1e293b; }
+    .side-h .m {
+      width: 38px; height: 38px; border-radius: 10px;
+      background: linear-gradient(135deg, #2563eb, #7c3aed); color: #fff;
+      display: grid; place-items: center; font-weight: 800;
+    }
+    .side-h h2 { font-size: 17px; font-weight: 700; }
+    .side-nav { flex: 1; padding: 10px 8px; overflow-y: auto; }
+    .ni {
+      display: flex; align-items: center; gap: 10px; width: 100%;
+      padding: 10px 12px; border-radius: 10px; border: none; background: none;
+      color: #94a3b8; font-size: 14px; font-weight: 500; cursor: pointer; text-align: right;
+      margin-bottom: 2px;
+    }
+    .ni:hover { background: #1e293b; color: #f1f5f9; }
+    .ni.on { background: var(--p); color: #fff; }
+    .side-f { padding: 14px; border-top: 1px solid #1e293b; }
+    .uchip { display: flex; align-items: center; gap: 10px; padding: 6px; border-radius: 10px; }
+    .av {
+      width: 34px; height: 34px; border-radius: 50%; background: var(--p);
+      display: grid; place-items: center; color: #fff; font-weight: 700; font-size: 13px; flex-shrink: 0;
+    }
+    .uchip .nm { font-size: 13px; font-weight: 600; color: #f1f5f9; }
+    .uchip .em { font-size: 11px; color: #64748b; }
+    .main { flex: 1; margin-right: 250px; min-height: 100vh; display: flex; flex-direction: column; }
+    .top {
+      background: #fff; border-bottom: 1px solid var(--bd); padding: 10px 20px;
+      display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 30;
+    }
+    .top-r { display: flex; align-items: center; gap: 8px; position: relative; }
+    .iconb {
+      width: 38px; height: 38px; border-radius: 10px; border: none; background: transparent;
+      cursor: pointer; font-size: 17px; position: relative; color: var(--t2);
+    }
+    .iconb:hover { background: var(--bg); }
+    .badge {
+      position: absolute; top: 3px; left: 3px; background: var(--err); color: #fff;
+      font-size: 10px; font-weight: 700; min-width: 15px; height: 15px; border-radius: 99px;
+      display: grid; place-items: center; padding: 0 3px;
+    }
+    .content { padding: 22px; flex: 1; }
+    .pt { font-size: 21px; font-weight: 800; margin-bottom: 4px; }
+    .pd { color: var(--t2); font-size: 13px; margin-bottom: 20px; }
+    .grid { display: grid; gap: 14px; }
+    .g4 { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
+    .g3 { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
+    .stat {
+      background: #fff; border: 1px solid var(--bd); border-radius: var(--r);
+      padding: 18px; box-shadow: var(--sh);
+    }
+    .stat .l { font-size: 12px; color: var(--t2); }
+    .stat .v { font-size: 26px; font-weight: 800; margin-top: 2px; }
+    .card {
+      background: #fff; border: 1px solid var(--bd); border-radius: var(--r);
+      padding: 18px; box-shadow: var(--sh);
+    }
+    .ct { font-size: 15px; font-weight: 700; margin-bottom: 12px; }
+    .empty { text-align: center; padding: 40px 16px; color: var(--mu); }
+    .empty .b { font-size: 36px; margin-bottom: 8px; }
+    .pcard {
+      background: #fff; border: 1px solid var(--bd); border-radius: var(--r);
+      padding: 16px; cursor: pointer; transition: .15s;
+    }
+    .pcard:hover { border-color: var(--p); box-shadow: var(--sh); }
+    .pcard .ty {
+      font-size: 11px; font-weight: 600; color: var(--p); background: var(--pl);
+      display: inline-block; padding: 2px 8px; border-radius: 6px; margin-bottom: 6px;
+    }
+    .pcard h3 { font-size: 14px; font-weight: 700; margin-bottom: 6px; }
+    .pcard .meta { font-size: 12px; color: var(--mu); display: flex; gap: 10px; flex-wrap: wrap; }
+    .dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-left: 3px; }
+    .dot-d { background: var(--mu); }
+    .dot-p { background: var(--ok); }
+    .dot-c { background: var(--warn); }
+    .bld { display: grid; grid-template-columns: 200px 1fr 260px; gap: 12px; min-height: 55vh; }
+    .bp { background: #fff; border: 1px solid var(--bd); border-radius: var(--r); padding: 14px; }
+    .flib button {
+      width: 100%; text-align: right; padding: 9px 10px; border: 1px solid var(--bd);
+      background: #fff; border-radius: 8px; margin-bottom: 5px; cursor: pointer; font-size: 13px;
+    }
+    .flib button:hover { border-color: var(--p); background: var(--pl); }
+    .fi {
+      background: #fff; border: 1px solid var(--bd); border-radius: 10px; padding: 12px 14px;
+      margin-bottom: 8px; position: relative; cursor: pointer;
+    }
+    .fi:hover { border-color: #93c5fd; }
+    .fi.sel { border-color: var(--p); box-shadow: 0 0 0 2px var(--pl); }
+    .fi label { font-weight: 600; font-size: 13px; display: block; margin-bottom: 5px; }
+    .fi .req { color: var(--err); }
+    .fi input, .fi textarea, .fi select {
+      width: 100%; padding: 8px 10px; border: 1px solid var(--bd); border-radius: 8px;
+    }
+    .fa { position: absolute; top: 6px; left: 6px; display: none; gap: 3px; }
+    .fi:hover .fa, .fi.sel .fa { display: flex; }
+    .fa button {
+      width: 26px; height: 26px; border-radius: 6px; border: 1px solid var(--bd);
+      background: #fff; cursor: pointer; font-size: 11px;
+    }
+    #npanel {
+      position: absolute; top: 48px; left: 0; width: 320px; max-height: 380px;
+      background: #fff; border: 1px solid var(--bd); border-radius: 12px;
+      box-shadow: var(--sh); overflow: auto; z-index: 50;
+    }
+    #npanel .hd {
+      padding: 11px 14px; border-bottom: 1px solid var(--bd); font-weight: 700;
+      display: flex; justify-content: space-between; font-size: 14px; position: sticky; top: 0; background: #fff;
+    }
+    .nit { padding: 11px 14px; border-bottom: 1px solid var(--bd); font-size: 13px; cursor: pointer; }
+    .nit:hover { background: var(--bg); }
+    .nit.ur { background: #eff6ff; }
+    .nit .tm { font-size: 11px; color: var(--mu); margin-top: 2px; }
+    #modal {
+      position: fixed; inset: 0; background: rgba(15,23,42,.5); display: none;
+      align-items: center; justify-content: center; z-index: 100; padding: 16px;
+    }
+    #modal.on { display: flex; }
+    #modal .box {
+      background: #fff; border-radius: 16px; padding: 24px; width: 100%; max-width: 440px;
+      box-shadow: 0 20px 40px rgba(0,0,0,.2);
+    }
+    #modal h3 { font-size: 17px; font-weight: 700; margin-bottom: 14px; }
+    .ma { display: flex; gap: 8px; margin-top: 18px; flex-wrap: wrap; }
+    #toasts { position: fixed; bottom: 20px; left: 20px; z-index: 200; display: flex; flex-direction: column; gap: 6px; }
+    .toast {
+      background: #0f172a; color: #f1f5f9; padding: 11px 16px; border-radius: 10px;
+      font-size: 13px; box-shadow: var(--sh); animation: up .2s ease;
+    }
+    .toast.ok { background: var(--ok); }
+    .toast.er { background: var(--err); }
+    @keyframes up { from { transform: translateY(12px); opacity: 0; } }
+    #public { display: none; width: 100%; margin: 0; padding: 0; min-height: 100vh; }
+    #public.on { display: block; }
+    #public .pubc { max-width: none; margin: 0; border: none; box-shadow: none; border-radius: 0; padding: 0; background: transparent; }
+    .pubc {
+      background: #fff; border-radius: 16px; padding: 28px; border: 1px solid var(--bd); box-shadow: var(--sh);
+    }
+    .pubc h1 { font-size: 20px; margin-bottom: 6px; }
+    .pubc .ds { color: var(--t2); font-size: 13px; margin-bottom: 20px; }
+    .pf { margin-bottom: 16px; }
+    .pf label { display: block; font-weight: 600; margin-bottom: 5px; font-size: 13px; }
+    .pf input, .pf textarea, .pf select {
+      width: 100%; padding: 10px 12px; border: 1px solid var(--bd); border-radius: 8px;
+    }
+    .okbox { text-align: center; padding: 36px 16px; }
+    .okbox .ck { font-size: 44px; color: var(--ok); margin-bottom: 8px; }
+    .menu-t { display: none; }
+    @media (max-width: 900px) {
+      .side { transform: translateX(100%); }
+      .side.open { transform: translateX(0); }
+      .main { margin-right: 0; }
+      .menu-t { display: grid; }
+      .bld { grid-template-columns: 1fr; }
+    }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th { background: var(--bg); text-align: right; padding: 9px 10px; font-weight: 600; }
+    td { padding: 9px 10px; border-bottom: 1px solid var(--bd); color: var(--t2); }
+  </style>
+</head>
+<body>
+<div id="auth">
+  <div class="auth-box">
+    <div class="auth-logo">
+      <div class="m">آ</div>
+      <h1>آزمونینو</h1>
+      <p>سامانه فرم‌ساز، آزمون‌ساز و جمع‌آوری داده</p>
+    </div>
+    <div id="authErr" class="auth-err"></div>
+    <div id="loginBox">
+      <div class="fg"><label>ایمیل</label><input type="email" id="inEmail" placeholder="you@example.com" autocomplete="username" /></div>
+      <div class="fg"><label>رمز عبور</label><input type="password" id="inPass" placeholder="••••••••" autocomplete="current-password" /></div>
+      <button type="button" class="btn btn-p" id="btnLogin">ورود</button>
+      <div class="auth-sw">حساب ندارید؟ <a id="goReg">ثبت‌نام</a></div>
+    </div>
+    <div id="regBox" class="hidden">
+      <div class="fg"><label>نام نمایشی</label><input type="text" id="regName" placeholder="نام شما" /></div>
+      <div class="fg"><label>ایمیل</label><input type="email" id="regEmail" placeholder="you@example.com" autocomplete="email" /></div>
+      <div class="fg"><label>رمز عبور</label><input type="password" id="regPass" placeholder="حداقل ۶ کاراکتر" autocomplete="new-password" /></div>
+      <button type="button" class="btn btn-p" id="btnReg">ایجاد حساب</button>
+      <div class="auth-sw">قبلاً ثبت‌نام کرده‌اید؟ <a id="goLogin">ورود</a></div>
+    </div>
+  </div>
+</div>
+<div id="app">
+  <aside class="side" id="side">
+    <div class="side-h"><div class="m">آ</div><h2>آزمونینو</h2></div>
+    <nav class="side-nav" id="nav">
+      <button type="button" class="ni on" data-p="dash">📊 نمای کلی</button>
+      <button type="button" class="ni" data-p="projects">📁 پروژه‌های من</button>
+      <button type="button" class="ni" data-p="forms">📝 فرم‌ها</button>
+      <button type="button" class="ni" data-p="quizzes">✅ آزمون‌ها</button>
+      <button type="button" class="ni" data-p="responses">📥 پاسخ‌ها</button>
+      <button type="button" class="ni" data-p="notifs">🔔 اعلان‌ها</button>
+      <button type="button" class="ni" data-p="support">🛟 پشتیبانی</button>
+      <button type="button" class="ni" data-p="settings">⚙️ تنظیمات</button>
+    </nav>
+    <div class="side-f">
+      <div class="uchip">
+        <div class="av" id="uAv">ک</div>
+        <div><div class="nm" id="uNm">کاربر</div><div class="em" id="uEm">—</div></div>
+      </div>
+    </div>
+  </aside>
+  <div class="main">
+    <header class="top">
+      <div style="display:flex;align-items:center;gap:10px">
+        <button type="button" class="iconb menu-t" id="btnMenu">☰</button>
+        <strong id="topTitle">نمای کلی</strong>
+      </div>
+      <div class="top-r">
+        <button type="button" class="btn btn-p btn-sm" id="btnNew">+ پروژه جدید</button>
+        <button type="button" class="iconb" id="btnNotif" title="اعلان‌ها">🔔<span class="badge hidden" id="nBadge">0</span></button>
+        <button type="button" class="iconb" id="btnOut" title="خروج">خروج</button>
+        <div id="npanel" class="hidden"></div>
+      </div>
+    </header>
+    <div class="content" id="content"></div>
+  </div>
+</div>
+<div id="public"></div>
+<div id="modal"><div class="box" id="modalBox"></div></div>
+<div id="toasts"></div>
+<script>
+(function () {
+  "use strict";
+  /* ذخیره‌ساز مقاوم برای فایل‌های بازشده با file:// و مرورگرهای محدودکننده */
+  var __azNativeStorage=null,__azFallback={},__azPrefix="__AZMOONINO_FALLBACK__:";
+  try{__azNativeStorage=window.localStorage;}catch(storageAccessError){__azNativeStorage=null;}
+  try{if(window.name&&window.name.indexOf(__azPrefix)===0)__azFallback=JSON.parse(window.name.slice(__azPrefix.length))||{};}catch(storageNameError){__azFallback={};}
+  var localStorage={
+    getItem:function(k){try{if(__azNativeStorage){var v=__azNativeStorage.getItem(k);if(v!==null)return v;}}catch(e){}return Object.prototype.hasOwnProperty.call(__azFallback,k)?__azFallback[k]:null;},
+    setItem:function(k,v){v=String(v);try{if(__azNativeStorage){__azNativeStorage.setItem(k,v);return;}}catch(e){}__azFallback[k]=v;try{window.name=__azPrefix+JSON.stringify(__azFallback);}catch(e){}},
+    removeItem:function(k){try{if(__azNativeStorage)__azNativeStorage.removeItem(k);}catch(e){}delete __azFallback[k];try{window.name=__azPrefix+JSON.stringify(__azFallback);}catch(e){}}
+  };
+  var KEY = "azmoonino_v2";
+  function load() {
+    try {
+      var raw = localStorage.getItem(KEY);
+      if (!raw) return emptyDB();
+      var db = JSON.parse(raw);
+      if (!db || typeof db !== "object") db = emptyDB();
+      ["users", "projects", "responses", "notifs", "tickets"].forEach(function(k) {
+        if (!Array.isArray(db[k])) db[k] = [];
+      });
+      if (!Object.prototype.hasOwnProperty.call(db, "session")) db.session = null;
+      return db;
+    } catch (e) { return emptyDB(); }
+  }
+  function emptyDB() {
+    return { users: [], session: null, projects: [], responses: [], notifs: [], tickets: [] };
+  }
+  function save(db) { try { localStorage.setItem(KEY, JSON.stringify(db)); return true; } catch(e) { toast("ذخیره‌سازی انجام نشد؛ فضای مرورگر ممکن است پر یا محدود باشد.","er"); return false; } }
+  function hash(s) {
+    var h = 5381;
+    for (var i = 0; i < s.length; i++) h = ((h << 5) + h) ^ s.charCodeAt(i);
+    return "x" + (h >>> 0).toString(16);
+  }
+  function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 9); }
+  function now() { return new Date().toISOString(); }
+  function faDate(iso) {
+    try {
+      return new Date(iso).toLocaleString("fa-IR", {
+        year: "numeric", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit"
+      });
+    } catch (e) { return iso || ""; }
+  }
+  function esc(s) {
+    if (s == null) return "";
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  }
+  var state = { page: "dash", builderId: null, selectedField: null };
+  function user() {
+    var db = load();
+    if (!db.session || !db.session.userId) return null;
+    for (var i = 0; i < db.users.length; i++) {
+      if (db.users[i].id === db.session.userId) return db.users[i];
+    }
+    return null;
+  }
+  function toast(msg, type) {
+    var el = document.createElement("div");
+    el.className = "toast" + (type === "ok" ? " ok" : type === "er" ? " er" : "");
+    el.textContent = msg;
+    document.getElementById("toasts").appendChild(el);
+    setTimeout(function () { el.remove(); }, 2800);
+  }
+  function showErr(msg) {
+    var e = document.getElementById("authErr");
+    e.textContent = msg;
+    e.classList.add("on");
+  }
+  function hideErr() {
+    var e = document.getElementById("authErr");
+    e.textContent = "";
+    e.classList.remove("on");
+  }
+  function openModal(html) {
+    document.getElementById("modalBox").innerHTML = html;
+    document.getElementById("modal").classList.add("on");
+  }
+  function closeModal() { document.getElementById("modal").classList.remove("on"); }
+  function showLogin() {
+    document.getElementById("loginBox").classList.remove("hidden");
+    document.getElementById("regBox").classList.add("hidden");
+    hideErr();
+  }
+  function showReg() {
+    document.getElementById("regBox").classList.remove("hidden");
+    document.getElementById("loginBox").classList.add("hidden");
+    hideErr();
+  }
+  function doRegister() {
+    hideErr();
+    var name = document.getElementById("regName").value.trim();
+    var email = document.getElementById("regEmail").value.trim().toLowerCase();
+    var pass = document.getElementById("regPass").value;
+    if (!name) return showErr("نام نمایشی را وارد کنید.");
+    if (!email || email.indexOf("@") < 1) return showErr("ایمیل معتبر وارد کنید.");
+    if (!pass || pass.length < 6) return showErr("رمز عبور باید حداقل ۶ کاراکتر باشد.");
+    var db = load();
+    for (var i = 0; i < db.users.length; i++) {
+      if (db.users[i].email === email) return showErr("این ایمیل قبلاً ثبت شده است.");
+    }
+    var u = { id: uid(), name: name, email: email, pass: hash(pass), avatar: name.charAt(0), createdAt: now() };
+    db.users.push(u);
+    db.session = { userId: u.id, at: now() };
+    db.notifs.push({ id: uid(), userId: u.id, title: "خوش آمدید", body: "حساب شما ساخته شد. اولین پروژه را ایجاد کنید.", read: false, at: now() });
+    save(db);
+    toast("حساب ساخته شد", "ok");
+    enterApp();
+  }
+  function doLogin() {
+    hideErr();
+    var email = document.getElementById("inEmail").value.trim().toLowerCase();
+    var pass = document.getElementById("inPass").value;
+    if (!email || !pass) return showErr("ایمیل و رمز عبور را وارد کنید.");
+    var db = load();
+    var found = null;
+    for (var i = 0; i < db.users.length; i++) {
+      if (db.users[i].email === email && db.users[i].pass === hash(pass)) { found = db.users[i]; break; }
+    }
+    if (!found) return showErr("ایمیل یا رمز عبور نادرست است.");
+    db.session = { userId: found.id, at: now() };
+    save(db);
+    toast("ورود موفق", "ok");
+    enterApp();
+  }
+  function doLogout() {
+    var db = load();
+    db.session = null;
+    save(db);
+    document.getElementById("app").classList.remove("on");
+    document.getElementById("auth").style.display = "flex";
+    showLogin();
+  }
+  function enterApp() {
+    var u = user();
+    if (!u) return;
+    document.getElementById("auth").style.display = "none";
+    document.getElementById("app").classList.add("on");
+    document.getElementById("uNm").textContent = u.name;
+    document.getElementById("uEm").textContent = u.email;
+    document.getElementById("uAv").textContent = u.avatar || u.name.charAt(0);
+    updateBadge();
+    go("dash");
+  }
+  var titles = {
+    dash: "نمای کلی", projects: "پروژه‌های من", forms: "فرم‌ها", quizzes: "آزمون‌ها",
+    responses: "پاسخ‌ها", notifs: "اعلان‌ها", support: "پشتیبانی", settings: "تنظیمات",
+    builder: "فرم‌ساز", project: "جزئیات پروژه"
+  };
+  function go(page, extra) {
+    state.page = page;
+    if (extra && extra.id) state.builderId = extra.id;
+    var nav = document.getElementById("nav").querySelectorAll(".ni");
+    for (var i = 0; i < nav.length; i++) {
+      nav[i].classList.toggle("on", nav[i].getAttribute("data-p") === page);
+    }
+    document.getElementById("topTitle").textContent = titles[page] || page;
+    document.getElementById("side").classList.remove("open");
+    render();
+  }
+  function render() {
+    var u = user();
+    if (!u) return;
+    var el = document.getElementById("content");
+    if (state.page === "dash") renderDash(el, u);
+    else if (state.page === "projects" || state.page === "forms" || state.page === "quizzes") renderProjects(el, u);
+    else if (state.page === "responses") renderResponses(el, u);
+    else if (state.page === "notifs") renderNotifs(el, u);
+    else if (state.page === "support") renderSupport(el, u);
+    else if (state.page === "settings") renderSettings(el, u);
+    else if (state.page === "builder") renderBuilder(el, u);
+    else if (state.page === "project") renderProject(el, u);
+    else el.innerHTML = '<div class="empty">صفحه یافت نشد</div>';
+  }
+  function renderDash(el, u) {
+    var db = load();
+    var projs = db.projects.filter(function (p) { return p.ownerId === u.id; });
+    var resps = db.responses.filter(function (r) {
+      return projs.some(function (p) { return p.id === r.projectId; });
+    });
+    var unread = db.notifs.filter(function (n) { return n.userId === u.id && !n.read; }).length;
+    var cards = projs.slice().reverse().slice(0, 6).map(projectCard).join("");
+    el.innerHTML =
+      '<div class="pt">سلام ' + esc(u.name) + '</div>' +
+      '<div class="pd">داشبورد آزمونینو</div>' +
+      '<div class="grid g4" style="margin-bottom:18px">' +
+        '<div class="stat"><div class="l">پروژه‌ها</div><div class="v">' + projs.length + '</div></div>' +
+        '<div class="stat"><div class="l">پاسخ‌ها</div><div class="v">' + resps.length + '</div></div>' +
+        '<div class="stat"><div class="l">اعلان خوانده‌نشده</div><div class="v">' + unread + '</div></div>' +
+        '<div class="stat"><div class="l">منتشرشده</div><div class="v">' + projs.filter(function(p){return p.status==="published";}).length + '</div></div>' +
+      '</div>' +
+      '<div style="margin-bottom:16px"><button type="button" class="btn btn-p" id="dashNew" style="width:auto">+ ساخت پروژه جدید</button></div>' +
+      '<div class="card"><div class="ct">پروژه‌های اخیر</div>' +
+      (projs.length === 0
+        ? '<div class="empty"><div class="b">📁</div><p>هنوز پروژه‌ای ندارید.</p></div>'
+        : '<div class="grid g3">' + cards + '</div>') +
+      '</div>';
+    var bn = document.getElementById("dashNew");
+    if (bn) bn.onclick = openCreate;
+    bindProjectCards(el);
+  }
+  function projectCard(p) {
+    var ty = { form: "فرم", quiz: "آزمون", survey: "نظرسنجی" }[p.type] || p.type;
+    var st = { draft: "پیش‌نویس", published: "منتشرشده", closed: "بسته" }[p.status] || p.status;
+    var dc = p.status === "published" ? "dot-p" : p.status === "closed" ? "dot-c" : "dot-d";
+    return (
+      '<div class="pcard" data-id="' + p.id + '">' +
+        '<span class="ty">' + ty + '</span>' +
+        '<h3>' + esc(p.title) + '</h3>' +
+        '<div class="meta">' +
+          '<span><span class="dot ' + dc + '"></span>' + st + '</span>' +
+          '<span>' + (p.fields ? p.fields.length : 0) + ' فیلد</span>' +
+          '<span>' + faDate(p.updatedAt || p.createdAt) + '</span>' +
+        '</div></div>'
+    );
+  }
+  function bindProjectCards(root) {
+    var cards = root.querySelectorAll(".pcard");
+    for (var i = 0; i < cards.length; i++) {
+      cards[i].onclick = (function (id) {
+        return function () { state.builderId = id; go("project"); };
+      })(cards[i].getAttribute("data-id"));
+    }
+  }
+  function renderProjects(el, u) {
+    var db = load();
+    var list = db.projects.filter(function (p) { return p.ownerId === u.id; });
+    if (state.page === "forms") list = list.filter(function (p) { return p.type === "form" || p.type === "survey"; });
+    if (state.page === "quizzes") list = list.filter(function (p) { return p.type === "quiz"; });
+    el.innerHTML =
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px">' +
+        '<div><div class="pt">' + esc(titles[state.page]) + '</div><div class="pd">' + list.length + ' مورد</div></div>' +
+        '<button type="button" class="btn btn-p" id="listNew" style="width:auto">+ پروژه جدید</button>' +
+      '</div>' +
+      (list.length === 0
+        ? '<div class="card"><div class="empty"><div class="b">📂</div>موردی نیست</div></div>'
+        : '<div class="grid g3">' + list.slice().reverse().map(projectCard).join("") + '</div>');
+    var bn = document.getElementById("listNew");
+    if (bn) bn.onclick = openCreate;
+    bindProjectCards(el);
+  }
+  function openCreate() {
+    openModal(
+      '<h3>ساخت پروژه جدید</h3>' +
+      '<div class="fg"><label>عنوان</label><input id="npTitle" placeholder="مثلاً ثبت‌نام کارگاه" /></div>' +
+      '<div class="fg"><label>نوع</label><select id="npType">' +
+        '<option value="form">فرم</option><option value="quiz">آزمون</option><option value="survey">نظرسنجی</option>' +
+      '</select></div>' +
+      '<div class="fg"><label>توضیح (اختیاری)</label><textarea id="npDesc" rows="2"></textarea></div>' +
+      '<div class="ma">' +
+        '<button type="button" class="btn btn-p" id="npGo" style="width:auto">ایجاد و باز کردن فرم‌ساز</button>' +
+        '<button type="button" class="btn btn-s" id="npCancel">انصراف</button>' +
+      '</div>'
+    );
+    document.getElementById("npCancel").onclick = closeModal;
+    document.getElementById("npGo").onclick = function () {
+      var title = document.getElementById("npTitle").value.trim();
+      var type = document.getElementById("npType").value;
+      var desc = document.getElementById("npDesc").value.trim();
+      if (!title) { toast("عنوان الزامی است", "er"); return; }
+      var u = user();
+      var db = load();
+      var p = {
+        id: uid(), ownerId: u.id, title: title, type: type, description: desc,
+        status: "draft", fields: [], publicId: uid().slice(0, 10),
+        createdAt: now(), updatedAt: now()
+      };
+      db.projects.push(p);
+      db.notifs.push({ id: uid(), userId: u.id, title: "پروژه ایجاد شد", body: "«" + title + "» ساخته شد.", read: false, at: now() });
+      save(db);
+      closeModal();
+      toast("پروژه ایجاد شد", "ok");
+      state.builderId = p.id;
+      go("builder");
+    };
+  }
+  function renderProject(el, u) {
+    var db = load();
+    var p = null;
+    for (var i = 0; i < db.projects.length; i++) {
+      if (db.projects[i].id === state.builderId && db.projects[i].ownerId === u.id) { p = db.projects[i]; break; }
+    }
+    if (!p) { el.innerHTML = '<div class="empty">پروژه پیدا نشد</div>'; return; }
+    var resps = db.responses.filter(function (r) { return r.projectId === p.id; });
+    var link = location.href.split("?")[0] + "?f=" + p.publicId;
+    var rows = resps.slice().reverse().slice(0, 25).map(function (r) {
+      return "<tr><td>" + faDate(r.at) + "</td><td>" + esc(sumResp(r, p)) + "</td></tr>";
+    }).join("");
+    el.innerHTML =
+      '<div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:16px">' +
+        '<div><div class="pt">' + esc(p.title) + '</div>' +
+        '<div class="pd">' + esc(p.description || "بدون توضیح") + " · " +
+          (p.status === "published" ? "منتشرشده" : p.status === "closed" ? "بسته" : "پیش‌نویس") +
+        "</div></div>" +
+        '<div style="display:flex;gap:6px;flex-wrap:wrap">' +
+          '<button type="button" class="btn btn-s btn-sm" id="pdEdit">ویرایش فرم</button>' +
+          (p.status !== "published"
+            ? '<button type="button" class="btn btn-p btn-sm" id="pdPub">انتشار</button>'
+            : '<button type="button" class="btn btn-s btn-sm" id="pdCopy">کپی لینک</button>' +
+              '<button type="button" class="btn btn-s btn-sm" id="pdClose">بستن فرم</button>') +
+          '<button type="button" class="btn btn-d btn-sm" id="pdDel">حذف</button>' +
+        "</div></div>" +
+      '<div class="grid g4" style="margin-bottom:16px">' +
+        '<div class="stat"><div class="l">فیلدها</div><div class="v">' + (p.fields ? p.fields.length : 0) + '</div></div>' +
+        '<div class="stat"><div class="l">پاسخ‌ها</div><div class="v">' + resps.length + '</div></div>' +
+        '<div class="stat"><div class="l">وضعیت</div><div class="v" style="font-size:16px">' +
+          (p.status === "published" ? "فعال" : "غیرفعال") + '</div></div></div>' +
+      (p.status === "published"
+        ? '<div class="card" style="margin-bottom:14px"><div class="ct">لینک عمومی</div>' +
+          '<div style="display:flex;gap:8px;flex-wrap:wrap">' +
+          '<input readonly value="' + esc(link) + '" style="flex:1;padding:9px;border:1px solid var(--bd);border-radius:8px;font-size:12px" id="linkInp" />' +
+          '<button type="button" class="btn btn-p btn-sm" id="pdCopy2">کپی</button></div>' +
+          '<p style="font-size:12px;color:var(--mu);margin-top:6px">نسخه آفلاین است: لینک فقط در مرورگری کار می‌کند که اطلاعات این پروژه در همان مرورگر ذخیره شده باشد. برای دریافت پاسخ از دستگاه‌های دیگر، نسخه سروری لازم است.</p></div>'
+        : "") +
+      '<div class="card"><div class="ct">پاسخ‌های دریافتی</div>' +
+      (resps.length === 0
+        ? '<div class="empty">هنوز پاسخی نیست</div>'
+        : '<table><thead><tr><th>زمان</th><th>خلاصه</th></tr></thead><tbody>' + rows + '</tbody></table>') +
+      "</div>";
+    document.getElementById("pdEdit").onclick = function () { go("builder"); };
+    var pub = document.getElementById("pdPub");
+    if (pub) pub.onclick = function () { publish(p.id); };
+    var cp = document.getElementById("pdCopy");
+    if (cp) cp.onclick = function () { copyText(link); };
+    var cp2 = document.getElementById("pdCopy2");
+    if (cp2) cp2.onclick = function () { copyText(link); };
+    var cl = document.getElementById("pdClose");
+    if (cl) cl.onclick = function () {
+      var d = load();
+      for (var i = 0; i < d.projects.length; i++) {
+        if (d.projects[i].id === p.id) { d.projects[i].status = "closed"; d.projects[i].updatedAt = now(); }
+      }
+      save(d);
+      toast("فرم بسته شد", "ok");
+      render();
+    };
+    document.getElementById("pdDel").onclick = function () {
+      if (!confirm("پروژه حذف شود؟ این عمل قابل بازگشت نیست.")) return;
+      var d = load();
+      d.projects = d.projects.filter(function (x) { return x.id !== p.id; });
+      d.responses = d.responses.filter(function (x) { return x.projectId !== p.id; });
+      save(d);
+      toast("حذف شد", "ok");
+      go("projects");
+    };
+  }
+  function sumResp(r, p) {
+    var parts = [];
+    var fields = p.fields || [];
+    for (var i = 0; i < Math.min(3, fields.length); i++) {
+      var v = r.answers && r.answers[fields[i].id];
+      if (v != null && v !== "") parts.push(String(v).slice(0, 40));
+    }
+    return parts.join(" · ") || "—";
+  }
+  function publish(id) {
+    var db = load();
+    var p = null;
+    for (var i = 0; i < db.projects.length; i++) {
+      if (db.projects[i].id === id) { p = db.projects[i]; break; }
+    }
+    if (!p) return;
+    if (!p.fields || p.fields.length === 0) { toast("حداقل یک فیلد اضافه کنید", "er"); return; }
+    p.status = "published";
+    p.updatedAt = now();
+    db.notifs.push({ id: uid(), userId: p.ownerId, title: "فرم منتشر شد", body: "«" + p.title + "» منتشر شد و لینک فعال است.", read: false, at: now() });
+    save(db);
+    toast("منتشر شد", "ok");
+    render();
+  }
+  function copyText(t) {
+    t = String(t == null ? '' : t);
+    if (!t) { toast('چیزی برای کپی‌کردن وجود ندارد.', 'er'); return; }
+    // remove any previous stuck copy helper
+    var old = document.getElementById('azCopyHelper');
+    if (old) old.remove();
+    function showManualCopy() {
+      var wrap = document.createElement('div');
+      wrap.id = 'azCopyHelper';
+      wrap.style.cssText = 'position:fixed;inset:0;z-index:999999;background:rgba(15,23,42,.55);display:flex;align-items:center;justify-content:center;padding:16px;';
+      wrap.innerHTML =
+        '<div style="background:#fff;color:#111;border-radius:14px;padding:18px;max-width:480px;width:100%;box-shadow:0 20px 50px rgba(0,0,0,.25);direction:rtl;font-family:Tahoma,system-ui,sans-serif">' +
+        '<div style="font-weight:800;margin-bottom:8px">کپی لینک</div>' +
+        '<p style="font-size:13px;color:#475569;margin-bottom:10px">متن زیر را انتخاب و کپی کنید (Ctrl+C یا Cmd+C).</p>' +
+        '<textarea id="azCopyTa" readonly style="width:100%;height:90px;padding:10px;border:2px solid #2563eb;border-radius:10px;font-size:14px;direction:ltr;text-align:left"></textarea>' +
+        '<div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">' +
+        '<button type="button" id="azCopySelect" style="background:#2563eb;color:#fff;border:none;padding:9px 14px;border-radius:10px;font-weight:600;cursor:pointer;font-family:inherit">انتخاب متن</button>' +
+        '<button type="button" id="azCopyClose" style="background:#e2e8f0;color:#0f172a;border:none;padding:9px 14px;border-radius:10px;font-weight:600;cursor:pointer;font-family:inherit">بستن</button>' +
+        '</div></div>';
+      document.body.appendChild(wrap);
+      var ta = document.getElementById('azCopyTa');
+      ta.value = t;
+      ta.focus(); ta.select(); ta.setSelectionRange(0, t.length);
+      document.getElementById('azCopySelect').onclick = function () { ta.focus(); ta.select(); ta.setSelectionRange(0, t.length); };
+      document.getElementById('azCopyClose').onclick = function () { wrap.remove(); };
+      wrap.onclick = function (e) { if (e.target === wrap) wrap.remove(); };
+    }
+    function fallbackCopy() {
+      var ta = document.createElement('textarea');
+      ta.value = t; ta.setAttribute('readonly', '');
+      ta.style.cssText = 'position:fixed;top:0;right:-9999px;opacity:0;font-size:16px';
+      document.body.appendChild(ta);
+      ta.focus(); ta.select(); ta.setSelectionRange(0, ta.value.length);
+      var ok = false;
+      try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
+      ta.remove();
+      if (ok) toast('لینک با موفقیت کپی شد.', 'ok');
+      else { toast('کپی خودکار پشتیبانی نشد؛ متن را دستی کپی کنید.', 'er'); showManualCopy(); }
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(t).then(function () { toast('لینک با موفقیت کپی شد.', 'ok'); }).catch(fallbackCopy);
+    } else fallbackCopy();
+  }
+  var FIELD_TYPES = [
+    { t: "text", l: "متن کوتاه", i: "✏️" },
+    { t: "textarea", l: "متن بلند", i: "📄" },
+    { t: "email", l: "ایمیل", i: "📧" },
+    { t: "number", l: "عدد", i: "🔢" },
+    { t: "select", l: "فهرست کشویی", i: "▼" },
+    { t: "radio", l: "تک‌گزینه‌ای", i: "◯" },
+    { t: "checkbox", l: "چندگزینه‌ای", i: "☑" },
+    { t: "date", l: "تاریخ", i: "📅" },
+    { t: "rating", l: "امتیاز", i: "⭐" }
+  ];
+  function getProj() {
+    var db = load();
+    var u = user();
+    for (var i = 0; i < db.projects.length; i++) {
+      if (db.projects[i].id === state.builderId && db.projects[i].ownerId === u.id) return db.projects[i];
+    }
+    return null;
+  }
+  function saveFields(fields) {
+    var db = load();
+    for (var i = 0; i < db.projects.length; i++) {
+      if (db.projects[i].id === state.builderId) {
+        db.projects[i].fields = fields;
+        db.projects[i].updatedAt = now();
+        break;
+      }
+    }
+    save(db);
+  }
+  function renderBuilder(el, u) {
+    var p = getProj();
+    if (!p) { el.innerHTML = '<div class="empty">پروژه پیدا نشد</div>'; return; }
+    state.selectedField = null;
+    var lib = FIELD_TYPES.map(function (f) {
+      return '<button type="button" data-t="' + f.t + '">' + f.i + " " + f.l + "</button>";
+    }).join("");
+    el.innerHTML =
+      '<div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:12px">' +
+        '<div><div class="pt">فرم‌ساز: ' + esc(p.title) + '</div>' +
+        '<div class="pd">فیلد اضافه کنید · ذخیره خودکار</div></div>' +
+        '<div style="display:flex;gap:6px;flex-wrap:wrap">' +
+          '<button type="button" class="btn btn-s btn-sm" id="bBack">بازگشت</button>' +
+          (p.status !== "published" ? '<button type="button" class="btn btn-p btn-sm" id="bPub">انتشار</button>' : "") +
+        "</div></div>" +
+      '<div class="bld">' +
+        '<div class="bp flib"><div style="font-weight:700;font-size:12px;margin-bottom:8px;color:var(--t2)">کتابخانه فیلدها</div>' + lib + "</div>" +
+        '<div class="bp" id="canvas"></div>' +
+        '<div class="bp"><div style="font-weight:700;font-size:12px;margin-bottom:8px;color:var(--t2)">تنظیمات فیلد</div><div id="props" style="color:var(--mu);font-size:13px">یک فیلد را انتخاب کنید</div></div>' +
+      "</div>";
+    document.getElementById("bBack").onclick = function () { go("project"); };
+    var bp = document.getElementById("bPub");
+    if (bp) bp.onclick = function () { publish(p.id); go("project"); };
+    var libBtns = el.querySelectorAll(".flib button");
+    for (var i = 0; i < libBtns.length; i++) {
+      libBtns[i].onclick = (function (t) { return function () { addField(t); }; })(libBtns[i].getAttribute("data-t"));
+    }
+    drawCanvas();
+  }
+  function addField(type) {
+    var p = getProj();
+    if (!p) return;
+    var label = "فیلد جدید";
+    for (var i = 0; i < FIELD_TYPES.length; i++) {
+      if (FIELD_TYPES[i].t === type) { label = FIELD_TYPES[i].l; break; }
+    }
+    var f = {
+      id: uid(), type: type, label: label, required: false, placeholder: "",
+      options: (type === "select" || type === "radio" || type === "checkbox") ? ["گزینه ۱", "گزینه ۲"] : []
+    };
+    var fields = (p.fields || []).slice();
+    fields.push(f);
+    saveFields(fields);
+    state.selectedField = f.id;
+    drawCanvas();
+    drawProps();
+    toast("فیلد اضافه شد", "ok");
+  }
+  function drawCanvas() {
+    var canvas = document.getElementById("canvas");
+    if (!canvas) return;
+    var p = getProj();
+    if (!p) return;
+    var fields = p.fields || [];
+    if (fields.length === 0) {
+      canvas.innerHTML = '<div class="empty"><div class="b">🧩</div><p>از سمت راست فیلد اضافه کنید</p></div>';
+      return;
+    }
+    var html = "";
+    for (var i = 0; i < fields.length; i++) {
+      var f = fields[i];
+      var sel = state.selectedField === f.id ? " sel" : "";
+      html +=
+        '<div class="fi' + sel + '" data-id="' + f.id + '">' +
+          '<div class="fa">' +
+            '<button type="button" data-a="up" title="بالا">↑</button>' +
+            '<button type="button" data-a="dn" title="پایین">↓</button>' +
+            '<button type="button" data-a="rm" title="حذف">🗑</button>' +
+          "</div>" +
+          "<label>" + esc(f.label) + (f.required ? ' <span class="req">*</span>' : "") + "</label>" +
+          fieldPreview(f) +
+        "</div>";
+    }
+    canvas.innerHTML = html;
+    var items = canvas.querySelectorAll(".fi");
+    for (var j = 0; j < items.length; j++) {
+      items[j].onclick = (function (id) {
+        return function (e) {
+          if (e.target.closest && e.target.closest(".fa")) return;
+          state.selectedField = id;
+          drawCanvas();
+          drawProps();
+        };
+      })(items[j].getAttribute("data-id"));
+      var acts = items[j].querySelectorAll(".fa button");
+      for (var k = 0; k < acts.length; k++) {
+        acts[k].onclick = (function (id, a) {
+          return function (e) {
+            e.stopPropagation();
+            if (a === "rm") removeField(id);
+            else if (a === "up") moveField(id, -1);
+            else if (a === "dn") moveField(id, 1);
+          };
+        })(items[j].getAttribute("data-id"), acts[k].getAttribute("data-a"));
+      }
+    }
+  }
+  function fieldPreview(f) {
+    if (f.type === "textarea")
+      return '<textarea rows="2" disabled placeholder="' + esc(f.placeholder || "") + '"></textarea>';
+    if (f.type === "select") {
+      var o = (f.options || []).map(function (x) { return "<option>" + esc(x) + "</option>"; }).join("");
+      return "<select disabled><option>انتخاب کنید</option>" + o + "</select>";
+    }
+    if (f.type === "radio")
+      return (f.options || []).map(function (x) {
+        return '<label style="display:block;font-weight:400;margin:3px 0"><input type="radio" disabled /> ' + esc(x) + "</label>";
+      }).join("");
+    if (f.type === "checkbox")
+      return (f.options || []).map(function (x) {
+        return '<label style="display:block;font-weight:400;margin:3px 0"><input type="checkbox" disabled /> ' + esc(x) + "</label>";
+      }).join("");
+    if (f.type === "rating")
+      return '<div style="font-size:18px;color:#f59e0b">☆ ☆ ☆ ☆ ☆</div>';
+    var tp = f.type === "email" ? "email" : f.type === "number" ? "number" : f.type === "date" ? "date" : "text";
+    return '<input type="' + tp + '" disabled placeholder="' + esc(f.placeholder || "") + '" />';
+  }
+  function drawProps() {
+    var box = document.getElementById("props");
+    if (!box) return;
+    var p = getProj();
+    if (!p) return;
+    var f = null;
+    for (var i = 0; i < (p.fields || []).length; i++) {
+      if (p.fields[i].id === state.selectedField) { f = p.fields[i]; break; }
+    }
+    if (!f) {
+      box.innerHTML = '<span style="color:var(--mu)">یک فیلد را انتخاب کنید</span>';
+      return;
+    }
+    var optBlock = "";
+    if (f.type === "select" || f.type === "radio" || f.type === "checkbox") {
+      optBlock =
+        '<div class="fg"><label>گزینه‌ها (هر خط یکی)</label>' +
+        '<textarea id="fpOpts" rows="4">' + esc((f.options || []).join("\n")) + "</textarea></div>";
+    }
+    box.innerHTML =
+      '<div class="fg"><label>برچسب</label><input id="fpLabel" value="' + esc(f.label) + '" /></div>' +
+      '<div class="fg"><label>متن راهنما</label><input id="fpPh" value="' + esc(f.placeholder || "") + '" /></div>' +
+      '<div class="fg"><label><input type="checkbox" id="fpReq" ' + (f.required ? "checked" : "") + ' /> الزامی</label></div>' +
+      optBlock;
+    document.getElementById("fpLabel").onchange = function () { setProp("label", this.value); };
+    document.getElementById("fpPh").onchange = function () { setProp("placeholder", this.value); };
+    document.getElementById("fpReq").onchange = function () { setProp("required", this.checked); };
+    var opts = document.getElementById("fpOpts");
+    if (opts) {
+      opts.onchange = function () {
+        var lines = this.value.split("\n").map(function (s) { return s.trim(); }).filter(Boolean);
+        setProp("options", lines);
+      };
+    }
+  }
+  function setProp(key, val) {
+    var p = getProj();
+    if (!p) return;
+    var fields = (p.fields || []).map(function (f) {
+      if (f.id !== state.selectedField) return f;
+      var n = {};
+      for (var k in f) n[k] = f[k];
+      n[key] = val;
+      return n;
+    });
+    saveFields(fields);
+    drawCanvas();
+  }
+  function removeField(id) {
+    var p = getProj();
+    if (!p) return;
+    saveFields((p.fields || []).filter(function (f) { return f.id !== id; }));
+    if (state.selectedField === id) state.selectedField = null;
+    drawCanvas();
+    drawProps();
+  }
+  function moveField(id, dir) {
+    var p = getProj();
+    if (!p) return;
+    var fields = (p.fields || []).slice();
+    var idx = -1;
+    for (var i = 0; i < fields.length; i++) if (fields[i].id === id) { idx = i; break; }
+    var n = idx + dir;
+    if (n < 0 || n >= fields.length) return;
+    var tmp = fields[idx];
+    fields[idx] = fields[n];
+    fields[n] = tmp;
+    saveFields(fields);
+    drawCanvas();
+  }
+  function renderResponses(el, u) {
+    var db = load();
+    var projs = db.projects.filter(function (p) { return p.ownerId === u.id; });
+    var resps = db.responses.filter(function (r) {
+      return projs.some(function (p) { return p.id === r.projectId; });
+    }).slice().reverse();
+    var rows = resps.map(function (r) {
+      var p = null;
+      for (var i = 0; i < projs.length; i++) if (projs[i].id === r.projectId) { p = projs[i]; break; }
+      return "<tr><td>" + (p ? esc(p.title) : "—") + "</td><td>" + faDate(r.at) + "</td><td>" +
+        (p ? esc(sumResp(r, p)) : "—") + "</td></tr>";
+    }).join("");
+    el.innerHTML =
+      '<div class="pt">پاسخ‌ها</div><div class="pd">' + resps.length + " پاسخ</div>" +
+      '<div class="card">' +
+      (resps.length === 0
+        ? '<div class="empty">پاسخی ثبت نشده</div>'
+        : '<table><thead><tr><th>پروژه</th><th>زمان</th><th>خلاصه</th></tr></thead><tbody>' + rows + "</tbody></table>") +
+      "</div>";
+  }
+  function updateBadge() {
+    var u = user();
+    if (!u) return;
+    var db = load();
+    var c = 0;
+    for (var i = 0; i < db.notifs.length; i++) {
+      if (db.notifs[i].userId === u.id && !db.notifs[i].read) c++;
+    }
+    var b = document.getElementById("nBadge");
+    if (c > 0) {
+      b.textContent = c > 9 ? "۹+" : String(c);
+      b.classList.remove("hidden");
+    } else b.classList.add("hidden");
+  }
+  function toggleNotif() {
+    var panel = document.getElementById("npanel");
+    panel.classList.toggle("hidden");
+    if (panel.classList.contains("hidden")) return;
+    var u = user();
+    var db = load();
+    var list = db.notifs.filter(function (n) { return n.userId === u.id; }).slice().reverse().slice(0, 20);
+    var html = '<div class="hd"><span>اعلان‌ها</span><a href="#" id="markAll" style="font-size:12px;color:var(--p)">خواندن همه</a></div>';
+    if (list.length === 0) html += '<div class="nit">اعلانی نیست</div>';
+    else {
+      for (var i = 0; i < list.length; i++) {
+        var n = list[i];
+        html += '<div class="nit' + (n.read ? "" : " ur") + '" data-id="' + n.id + '">' +
+          "<strong>" + esc(n.title) + "</strong><div>" + esc(n.body) + '</div><div class="tm">' + faDate(n.at) + "</div></div>";
+      }
+    }
+    panel.innerHTML = html;
+    document.getElementById("markAll").onclick = function (e) {
+      e.preventDefault();
+      var d = load();
+      for (var j = 0; j < d.notifs.length; j++) {
+        if (d.notifs[j].userId === u.id) d.notifs[j].read = true;
+      }
+      save(d);
+      updateBadge();
+      panel.classList.add("hidden");
+      toast("همه خوانده شد", "ok");
+    };
+    var items = panel.querySelectorAll(".nit[data-id]");
+    for (var k = 0; k < items.length; k++) {
+      items[k].onclick = (function (id) {
+        return function () {
+          var d = load();
+          for (var x = 0; x < d.notifs.length; x++) if (d.notifs[x].id === id) d.notifs[x].read = true;
+          save(d);
+          updateBadge();
+          toggleNotif();
+          toggleNotif();
+        };
+      })(items[k].getAttribute("data-id"));
+    }
+  }
+  function renderNotifs(el, u) {
+    var db = load();
+    var list = db.notifs.filter(function (n) { return n.userId === u.id; }).slice().reverse();
+    var html = list.map(function (n) {
+      return '<div class="nit' + (n.read ? "" : " ur") + '" style="border-radius:8px;margin-bottom:4px">' +
+        "<strong>" + esc(n.title) + "</strong><div>" + esc(n.body) + '</div><div class="tm">' + faDate(n.at) + "</div></div>";
+    }).join("");
+    el.innerHTML =
+      '<div class="pt">اعلان‌ها</div><div class="pd">' +
+      list.filter(function (n) { return !n.read; }).length + " خوانده‌نشده</div>" +
+      '<div class="card">' + (list.length ? html : '<div class="empty">اعلانی نیست</div>') + "</div>";
+  }
+  function renderSupport(el, u) {
+    var db = load();
+    var tickets = (db.tickets || []).filter(function (t) { return t.userId === u.id; }).slice().reverse();
+    var list = tickets.map(function (t) {
+      return '<div style="padding:12px 0;border-bottom:1px solid var(--bd)">' +
+        '<div style="display:flex;justify-content:space-between"><strong>' + esc(t.subject) + "</strong>" +
+        '<span style="font-size:12px;color:var(--mu)">' + esc(t.status) + "</span></div>" +
+        '<div style="font-size:13px;color:var(--t2);margin-top:3px">' + esc(t.body.slice(0, 100)) + "</div>" +
+        '<div style="font-size:11px;color:var(--mu);margin-top:3px">' + faDate(t.at) + " · " + t.id.slice(0, 8) + "</div></div>";
+    }).join("");
+    el.innerHTML =
+      '<div class="pt">پشتیبانی</div><div class="pd">درخواست‌های شما</div>' +
+      '<button type="button" class="btn btn-p" id="newT" style="width:auto;margin-bottom:14px">+ درخواست جدید</button>' +
+      '<div class="card">' + (tickets.length ? list : '<div class="empty">درخواستی نیست</div>') + "</div>";
+    document.getElementById("newT").onclick = function () {
+      openModal(
+        "<h3>درخواست پشتیبانی</h3>" +
+        '<div class="fg"><label>موضوع</label><input id="tsSub" /></div>' +
+        '<div class="fg"><label>دسته</label><select id="tsCat"><option>فنی</option><option>حساب</option><option>سایر</option></select></div>' +
+        '<div class="fg"><label>توضیح</label><textarea id="tsBody" rows="4"></textarea></div>' +
+        '<div class="ma"><button type="button" class="btn btn-p" id="tsGo" style="width:auto">ثبت</button>' +
+        '<button type="button" class="btn btn-s" id="tsX">انصراف</button></div>'
+      );
+      document.getElementById("tsX").onclick = closeModal;
+      document.getElementById("tsGo").onclick = function () {
+        var sub = document.getElementById("tsSub").value.trim();
+        var body = document.getElementById("tsBody").value.trim();
+        if (!sub || !body) { toast("موضوع و توضیح الزامی است", "er"); return; }
+        var d = load();
+        if (!d.tickets) d.tickets = [];
+        d.tickets.push({
+          id: uid(), userId: u.id, subject: sub, body: body,
+          category: document.getElementById("tsCat").value, status: "جدید", at: now()
+        });
+        d.notifs.push({
+          id: uid(), userId: u.id, title: "درخواست ثبت شد",
+          body: "«" + sub + "» در صف بررسی است.", read: false, at: now()
+        });
+        save(d);
+        closeModal();
+        toast("ثبت شد", "ok");
+        render();
+      };
+    };
+  }
+  function renderSettings(el, u) {
+    el.innerHTML =
+      '<div class="pt">تنظیمات</div><div class="pd">مدیریت حساب</div>' +
+      '<div class="card">' +
+        '<div style="padding:12px 0;border-bottom:1px solid var(--bd);display:flex;justify-content:space-between;align-items:center">' +
+          "<div><strong>نام</strong><div style=\"font-size:13px;color:var(--t2)\">" + esc(u.name) + "</div></div>" +
+          '<button type="button" class="btn btn-s btn-sm" id="chName">تغییر</button></div>' +
+        '<div style="padding:12px 0;border-bottom:1px solid var(--bd)"><strong>ایمیل</strong>' +
+          '<div style="font-size:13px;color:var(--t2)">' + esc(u.email) + "</div></div>" +
+        '<div style="padding:12px 0;border-bottom:1px solid var(--bd);display:flex;justify-content:space-between;align-items:center">' +
+          "<div><strong>رمز عبور</strong><div style=\"font-size:13px;color:var(--t2)\">••••••••</div></div>" +
+          '<button type="button" class="btn btn-s btn-sm" id="chPass">تغییر رمز</button></div>' +
+        '<div style="padding:12px 0;display:flex;justify-content:space-between;align-items:center">' +
+          "<div><strong>خروج</strong></div>" +
+          '<button type="button" class="btn btn-d btn-sm" id="setOut">خروج از حساب</button></div>' +
+        '<div style="padding:12px 0;border-top:1px solid var(--bd);display:flex;justify-content:space-between;align-items:center">' +
+          '<div><strong>پاک‌سازی داده</strong><div style="font-size:12px;color:var(--mu)">همه داده این مرورگر</div></div>' +
+          '<button type="button" class="btn btn-d btn-sm" id="wipe">پاک کردن</button></div>' +
+      "</div>";
+    document.getElementById("chName").onclick = function () {
+      var n = prompt("نام جدید:", u.name);
+      if (!n || !n.trim()) return;
+      var d = load();
+      for (var i = 0; i < d.users.length; i++) {
+        if (d.users[i].id === u.id) {
+          d.users[i].name = n.trim();
+          d.users[i].avatar = n.trim().charAt(0);
+        }
+      }
+      save(d);
+      toast("ذخیره شد", "ok");
+      enterApp();
+    };
+    document.getElementById("chPass").onclick = function () {
+      var p1 = prompt("رمز جدید (حداقل ۶ کاراکتر):");
+      if (!p1 || p1.length < 6) { toast("رمز نامعتبر", "er"); return; }
+      var d = load();
+      for (var i = 0; i < d.users.length; i++) {
+        if (d.users[i].id === u.id) d.users[i].pass = hash(p1);
+      }
+      save(d);
+      toast("رمز تغییر کرد", "ok");
+    };
+    document.getElementById("setOut").onclick = doLogout;
+    document.getElementById("wipe").onclick = function () {
+      if (!confirm("همه داده‌های این مرورگر پاک شود؟")) return;
+      localStorage.removeItem(KEY);
+      location.reload();
+    };
+  }
+  function tryPublic() {
+    var params = new URLSearchParams(location.search);
+    var fid = params.get("f");
+    if (!fid) return false;
+    document.getElementById("auth").style.display = "none";
+    document.getElementById("app").classList.remove("on");
+    var view = document.getElementById("public");
+    view.classList.add("on");
+    var db = load();
+    var p = null;
+    for (var i = 0; i < db.projects.length; i++) {
+      if (db.projects[i].publicId === fid) { p = db.projects[i]; break; }
+    }
+    if (!p) {
+      view.innerHTML = '<div class="pubc"><div class="empty">فرم یافت نشد.</div></div>';
+      return true;
+    }
+    if (p.status !== "published") {
+      view.innerHTML = '<div class="pubc"><div class="empty">این فرم در حال حاضر باز نیست.</div></div>';
+      return true;
+    }
+    var fieldsHtml = (p.fields || []).map(function (f) {
+      return '<div class="pf"><label>' + esc(f.label) + (f.required ? ' <span style="color:var(--err)">*</span>' : "") + "</label>" +
+        publicField(f) + "</div>";
+    }).join("");
+    view.innerHTML =
+      '<div class="pubc" id="pubCard">' +
+        "<h1>" + esc(p.title) + "</h1>" +
+        '<div class="ds">' + esc(p.description || "") + "</div>" +
+        '<form id="pubForm">' + fieldsHtml +
+        '<button type="submit" class="btn btn-p" style="margin-top:6px">ثبت پاسخ</button></form>' +
+      "</div>";
+    document.getElementById("pubForm").onsubmit = function (e) {
+      e.preventDefault();
+      var form = e.target;
+      var answers = {};
+      var fields = p.fields || [];
+      for (var i = 0; i < fields.length; i++) {
+        var f = fields[i];
+        if (f.type === "checkbox") {
+          var checked = form.querySelectorAll('input[name="' + f.id + '"]:checked');
+          var vals = [];
+          for (var c = 0; c < checked.length; c++) vals.push(checked[c].value);
+          answers[f.id] = vals.join(", ");
+        } else {
+          var inp = form.elements[f.id];
+          answers[f.id] = inp ? inp.value : "";
+        }
+      }
+      var d = load();
+      d.responses.push({ id: uid(), projectId: p.id, answers: answers, at: now() });
+      d.notifs.push({
+        id: uid(), userId: p.ownerId, title: "پاسخ جدید",
+        body: "پاسخ جدید برای «" + p.title + "»", read: false, at: now()
+      });
+      save(d);
+      document.getElementById("pubCard").innerHTML =
+        '<div class="okbox"><div class="ck">✓</div><h2>پاسخ ثبت شد</h2>' +
+        '<p style="color:var(--t2);margin-top:6px">از مشارکت شما سپاسگزاریم.</p></div>';
+      toast("پاسخ ثبت شد", "ok");
+    };
+    return true;
+  }
+  function publicField(f) {
+    var req = f.required ? "required" : "";
+    if (f.type === "textarea")
+      return '<textarea name="' + f.id + '" rows="3" placeholder="' + esc(f.placeholder || "") + '" ' + req + "></textarea>";
+    if (f.type === "select") {
+      var o = (f.options || []).map(function (x) {
+        return '<option value="' + esc(x) + '">' + esc(x) + "</option>";
+      }).join("");
+      return '<select name="' + f.id + '" ' + req + '><option value="">انتخاب کنید</option>' + o + "</select>";
+    }
+    if (f.type === "radio")
+      return (f.options || []).map(function (x) {
+        return '<label style="display:block;margin:5px 0"><input type="radio" name="' + f.id + '" value="' + esc(x) + '" ' + req + " /> " + esc(x) + "</label>";
+      }).join("");
+    if (f.type === "checkbox")
+      return (f.options || []).map(function (x) {
+        return '<label style="display:block;margin:5px 0"><input type="checkbox" name="' + f.id + '" value="' + esc(x) + '" /> ' + esc(x) + "</label>";
+      }).join("");
+    if (f.type === "rating") {
+      var stars = "";
+      for (var n = 1; n <= 5; n++) stars += '<option value="' + n + '">' + "★".repeat(n) + "</option>";
+      return '<select name="' + f.id + '" ' + req + '><option value="">امتیاز</option>' + stars + "</select>";
+    }
+    var tp = f.type === "email" ? "email" : f.type === "number" ? "number" : f.type === "date" ? "date" : "text";
+    return '<input type="' + tp + '" name="' + f.id + '" placeholder="' + esc(f.placeholder || "") + '" ' + req + " />";
+  }
+
+  /* === تکمیل قابلیت‌های نسخه مستقل آزمونینو === */
+  function ensureDB(d) {
+    ["contacts","groups","classes","files","activity","templates"].forEach(function(k){ if(!Array.isArray(d[k])) d[k]=[]; });
+    return d;
+  }
+  var _load = load;
+  load = function(){ return ensureDB(_load()); };
+  var _emptyDB = emptyDB;
+  emptyDB = function(){ return ensureDB(_emptyDB()); };
+  var _render = render;
+  render = function(){
+    var u=user(); if(!u) return;
+    var el=document.getElementById("content");
+    if(state.page==="reports") return renderReports(el,u);
+    if(state.page==="templates") return renderTemplates(el,u);
+    if(state.page==="contacts") return renderContacts(el,u);
+    if(state.page==="groups") return renderGroups(el,u);
+    if(state.page==="classes") return renderClasses(el,u);
+    if(state.page==="files") return renderFiles(el,u);
+    if(state.page==="help") return renderHelp(el,u);
+    return _render();
+  };
+  titles.reports="گزارش‌ها"; titles.templates="قالب‌ها"; titles.contacts="مخاطبان";
+  titles.groups="گروه‌ها"; titles.classes="کلاس‌ها"; titles.files="فایل‌ها"; titles.help="راهنما";
+  var nav=document.getElementById("nav");
+  [
+    ["reports","📈 گزارش‌ها"],["templates","🧩 قالب‌ها"],["contacts","👥 مخاطبان"],
+    ["groups","🧑‍🤝‍🧑 گروه‌ها"],["classes","🏫 کلاس‌ها"],["files","🗂 فایل‌ها"],["help","❔ راهنما"]
+  ].forEach(function(x){
+    if(!nav.querySelector('[data-p="'+x[0]+'"]')){
+      var b=document.createElement("button"); b.type="button"; b.className="ni";
+      b.setAttribute("data-p",x[0]); b.textContent=x[1]; nav.appendChild(b);
+    }
+  });
+  var baseTypes=FIELD_TYPES.slice();
+  [
+    ["name","نام"],["phone","شماره تلفن"],["time","ساعت"],["url","نشانی اینترنتی"],
+    ["yesno","بله یا خیر"],["file","بارگذاری فایل"],["address","نشانی"],
+    ["postal","کد پستی"],["money","مبلغ"],["stars","امتیاز ستاره‌ای"],
+    ["likert","مقیاس رضایت"],["title","عنوان"],["note","توضیح"]
+  ].forEach(function(x){ if(!FIELD_TYPES.some(function(f){return f.t===x[0]})) FIELD_TYPES.push({t:x[0],l:x[1],i:"＋"}); });
+  function ownedProjects(u){ return load().projects.filter(function(p){return p.ownerId===u.id;}); }
+  function downloadText(name,text,mime){
+    var blob=new Blob([text],{type:mime||"text/plain;charset=utf-8"});
+    var url=URL.createObjectURL(blob),a=document.createElement("a");
+    a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();
+    setTimeout(function(){URL.revokeObjectURL(url)},1200);
+  }
+  function csvCell(v){ return '"'+String(v==null?"":v).replace(/"/g,'""')+'"'; }
+  function exportResponses(projectId){
+    var d=load(),p=d.projects.filter(function(x){return x.id===projectId})[0];
+    if(!p)return;
+    var rs=d.responses.filter(function(r){return r.projectId===projectId});
+    var heads=["شناسه پاسخ","زمان"].concat((p.fields||[]).map(function(f){return f.label}));
+    var lines=[heads.map(csvCell).join(",")];
+    rs.forEach(function(r){lines.push([r.id,r.at].concat((p.fields||[]).map(function(f){return r.answers&&r.answers[f.id]})).map(csvCell).join(","));});
+    downloadText("azmoonino-responses-"+p.title.replace(/[^\w\u0600-\u06FF-]/g,"_")+".csv","\uFEFF"+lines.join("\r\n"),"text/csv;charset=utf-8");
+    toast("خروجی پاسخ‌ها آماده شد","ok");
+  }
+  function renderReports(el,u){
+    var d=load(),ps=ownedProjects(u),rs=d.responses.filter(function(r){return ps.some(function(p){return p.id===r.projectId})});
+    var html=ps.map(function(p){
+      var n=rs.filter(function(r){return r.projectId===p.id}).length;
+      return '<tr><td>'+esc(p.title)+'</td><td>'+n+'</td><td>'+esc(p.status==="published"?"منتشرشده":p.status==="closed"?"بسته":"پیش‌نویس")+'</td><td><button class="btn btn-s btn-sm" data-export="'+p.id+'">خروجی CSV</button></td></tr>';
+    }).join("");
+    el.innerHTML='<div class="pt">گزارش‌ها و تحلیل</div><div class="pd">آمار بر اساس پاسخ‌های ذخیره‌شده در همین مرورگر</div>'+
+      '<div class="grid g4" style="margin-bottom:16px"><div class="stat"><div class="l">کل پروژه‌ها</div><div class="v">'+ps.length+'</div></div><div class="stat"><div class="l">کل پاسخ‌ها</div><div class="v">'+rs.length+'</div></div><div class="stat"><div class="l">میانگین پاسخ هر پروژه</div><div class="v">'+(ps.length?(rs.length/ps.length).toFixed(1):"۰")+'</div></div><div class="stat"><div class="l">پروژه‌های فعال</div><div class="v">'+ps.filter(function(p){return p.status==="published"}).length+'</div></div></div>'+
+      '<div class="card"><div class="ct">گزارش پروژه‌ها</div>'+(ps.length?'<table><thead><tr><th>پروژه</th><th>پاسخ</th><th>وضعیت</th><th>خروجی</th></tr></thead><tbody>'+html+'</tbody></table>':'<div class="empty">هنوز پروژه‌ای ندارید.</div>')+'</div>';
+    el.querySelectorAll("[data-export]").forEach(function(b){b.onclick=function(){exportResponses(b.getAttribute("data-export"))}});
+  }
+  function renderTemplates(el,u){
+    var templates=[
+      {title:"آزمون چهارگزینه‌ای",type:"quiz",desc:"نمونه آزمون با پرسش‌های چندگزینه‌ای"},
+      {title:"فرم ثبت‌نام",type:"form",desc:"دریافت اطلاعات پایه شرکت‌کنندگان"},
+      {title:"نظرسنجی رضایت",type:"survey",desc:"جمع‌آوری بازخورد و امتیازدهی"}
+    ];
+    el.innerHTML='<div class="pt">قالب‌های آماده</div><div class="pd">با انتخاب قالب، یک پروژه قابل ویرایش ساخته می‌شود.</div><div class="grid g3">'+templates.map(function(t,i){return '<div class="card"><div class="ct">'+t.title+'</div><p style="color:var(--t2);font-size:13px;margin-bottom:14px">'+t.desc+'</p><button class="btn btn-p btn-sm" data-template="'+i+'">استفاده از قالب</button></div>'}).join("")+'</div>';
+    el.querySelectorAll("[data-template]").forEach(function(b){b.onclick=function(){
+      var t=templates[+b.getAttribute("data-template")],d=load(),p={id:uid(),ownerId:u.id,title:t.title,type:t.type,description:t.desc,status:"draft",publicId:uid().slice(0,10),createdAt:now(),updatedAt:now(),fields:[]};
+      if(t.type==="quiz"){
+        p.fields=[{id:uid(),type:"radio",label:"نمونه سؤال",required:true,options:["گزینه اول","گزینه دوم","گزینه سوم","گزینه چهارم"],correctAnswer:"گزینه اول",points:1}];
+      } else {
+        p.fields=[{id:uid(),type:"text",label:"نام و نام خانوادگی",required:true,options:[]},{id:uid(),type:"email",label:"ایمیل",required:false,options:[]}];
+      }
+      d.projects.push(p);save(d);state.builderId=p.id;go("builder");
+    }});
+  }
+  function renderContacts(el,u){
+    var d=load(),items=d.contacts.filter(function(c){return c.ownerId===u.id});
+    el.innerHTML='<div class="pt">مخاطبان</div><div class="pd">دفتر مخاطبان شخصی</div><button class="btn btn-p btn-sm" id="addContact">+ مخاطب جدید</button><div class="card" style="margin-top:14px">'+(items.length?items.map(function(c){return '<div style="padding:10px 0;border-bottom:1px solid var(--bd)"><b>'+esc(c.name)+'</b><div style="font-size:12px;color:var(--t2)">'+esc(c.email||"بدون ایمیل")+'</div></div>'}).join(""):'<div class="empty">مخاطبی ثبت نشده است.</div>')+'</div>';
+    document.getElementById("addContact").onclick=function(){openModal('<h3>افزودن مخاطب</h3><div class="fg"><label>نام</label><input id="cn"/></div><div class="fg"><label>ایمیل یا راه ارتباطی</label><input id="ce"/></div><div class="ma"><button class="btn btn-p" id="cs">ذخیره</button><button class="btn btn-s" id="cx">انصراف</button></div>');document.getElementById("cx").onclick=closeModal;document.getElementById("cs").onclick=function(){var n=document.getElementById("cn").value.trim();if(!n)return toast("نام را وارد کنید","er");var z=load();z.contacts.push({id:uid(),ownerId:u.id,name:n,email:document.getElementById("ce").value.trim(),at:now()});save(z);closeModal();render();};};
+  }
+  function simpleCollection(el,u,key,title){
+    var d=load(),items=d[key].filter(function(x){return x.ownerId===u.id});
+    el.innerHTML='<div class="pt">'+title+'</div><div class="pd">مدیریت محلی '+title+'</div><button class="btn btn-p btn-sm" id="addItem">+ ایجاد</button><div class="card" style="margin-top:14px">'+(items.length?items.map(function(x){return '<div style="padding:10px 0;border-bottom:1px solid var(--bd)"><b>'+esc(x.title)+'</b><div style="font-size:12px;color:var(--t2)">'+esc(x.desc||"")+'</div></div>'}).join(""):'<div class="empty">موردی ثبت نشده است.</div>')+'</div>';
+    document.getElementById("addItem").onclick=function(){openModal('<h3>ایجاد '+title+'</h3><div class="fg"><label>عنوان</label><input id="itTitle"/></div><div class="fg"><label>توضیح</label><textarea id="itDesc"></textarea></div><div class="ma"><button class="btn btn-p" id="itSave">ذخیره</button><button class="btn btn-s" id="itCancel">انصراف</button></div>');document.getElementById("itCancel").onclick=closeModal;document.getElementById("itSave").onclick=function(){var t=document.getElementById("itTitle").value.trim();if(!t)return toast("عنوان الزامی است","er");var z=load();z[key].push({id:uid(),ownerId:u.id,title:t,desc:document.getElementById("itDesc").value,at:now()});save(z);closeModal();render();};};
+  }
+  function renderGroups(el,u){simpleCollection(el,u,"groups","گروه‌ها");}
+  function renderClasses(el,u){simpleCollection(el,u,"classes","کلاس‌ها");}
+  function renderFiles(el,u){
+    var d=load(),ps=ownedProjects(u);
+    el.innerHTML='<div class="pt">مدیریت فایل‌ها و پشتیبان‌گیری</div><div class="pd">داده‌های پروژه و پاسخ‌ها را برای نگهداری یا انتقال دریافت کنید.</div><div class="card"><div class="ct">پشتیبان کامل</div><p style="font-size:13px;color:var(--t2);margin-bottom:12px">شامل پروژه‌ها، فیلدها، پاسخ‌ها، مخاطبان، گروه‌ها و تنظیمات محلی است.</p><button class="btn btn-p" id="backup">دانلود نسخه پشتیبان JSON</button> <button class="btn btn-s" id="restoreBtn">بازیابی از فایل JSON</button><input type="file" id="restoreFile" accept=".json,application/json" class="hidden"/></div><div class="card" style="margin-top:14px"><div class="ct">پروژه‌ها</div>'+ps.map(function(p){return '<div style="padding:8px 0;border-bottom:1px solid var(--bd)">'+esc(p.title)+' <span style="color:var(--mu);font-size:12px">· '+(p.fields||[]).length+' فیلد</span></div>'}).join("")+'</div>';
+    document.getElementById("backup").onclick=function(){var data=load();data.session=null;downloadText("azmoonino-backup.json",JSON.stringify(data,null,2),"application/json");};
+    document.getElementById("restoreBtn").onclick=function(){document.getElementById("restoreFile").click()};
+    document.getElementById("restoreFile").onchange=function(){var f=this.files[0];if(!f)return;var rd=new FileReader();rd.onload=function(){try{var x=JSON.parse(rd.result);if(!Array.isArray(x.users)||!Array.isArray(x.projects)||!Array.isArray(x.responses))throw 0;if(!confirm("بازیابی، داده‌های فعلی این مرورگر را جایگزین می‌کند. ادامه؟"))return;localStorage.setItem(KEY,JSON.stringify(x));toast("بازیابی انجام شد","ok");location.reload()}catch(e){toast("فایل پشتیبان معتبر نیست","er")}};rd.readAsText(f)};
+  }
+  function renderHelp(el){
+    var topics=[["شروع کار","ابتدا پروژه جدید بسازید، سپس نوع پروژه را انتخاب کنید و فیلدها یا سؤال‌ها را به آن اضافه کنید."],["ساخت فرم","از کتابخانه فیلدها استفاده کنید. با انتخاب هر فیلد می‌توانید عنوان، متن راهنما و الزامی‌بودن آن را تنظیم کنید."],["آزمون‌سازی","برای سؤال‌های گزینه‌ای، پاسخ صحیح و نمره را در تنظیمات فیلد تعیین کنید. تصحیح خودکار برای سؤال‌های پشتیبانی‌شده انجام می‌شود."],["پاسخ‌ها","پاسخ‌های ثبت‌شده در همین مرورگر در بخش پاسخ‌ها و گزارش‌ها دیده می‌شوند."],["پشتیبان‌گیری","از بخش فایل‌ها نسخه JSON بگیرید تا داده‌ها را به مرورگر دیگری منتقل کنید."]];
+    el.innerHTML='<div class="pt">مرکز راهنما</div><div class="pd">راهنمای استفاده از امکانات فعال نسخه مستقل</div>'+topics.map(function(t){return '<div class="card" style="margin-bottom:10px"><b>'+t[0]+'</b><p style="font-size:13px;color:var(--t2);margin-top:5px">'+t[1]+'</p></div>'}).join("");
+  }
+  /* گسترش تنظیمات و عملیات پروژه */
+  var oldDrawProps=drawProps;
+  drawProps=function(){
+    oldDrawProps();
+    var box=document.getElementById("props"),p=getProj(),f=null;
+    if(!box||!p)return;
+    (p.fields||[]).forEach(function(x){if(x.id===state.selectedField)f=x});
+    if(!f)return;
+    var extra="";
+    if(p.type==="quiz" && (f.type==="radio"||f.type==="select"||f.type==="text"||f.type==="number")){
+      extra='<div class="fg"><label>پاسخ صحیح</label><input id="fpCorrect" value="'+esc(f.correctAnswer||"")+'" placeholder="متن دقیق پاسخ صحیح"/></div><div class="fg"><label>نمره سؤال</label><input id="fpPoints" type="number" min="0" step="0.25" value="'+(Number(f.points)||1)+'"/></div>';
+    }
+    extra+='<div class="ma"><button type="button" class="btn btn-s btn-sm" id="fpDuplicate">کپی فیلد</button></div>';
+    box.insertAdjacentHTML("beforeend",extra);
+    var c=document.getElementById("fpCorrect"),pt=document.getElementById("fpPoints");
+    if(c)c.onchange=function(){setProp("correctAnswer",this.value)};
+    if(pt)pt.onchange=function(){setProp("points",Math.max(0,Number(this.value)||0))};
+    var du=document.getElementById("fpDuplicate");
+    if(du)du.onclick=function(){var z=getProj(),arr=(z.fields||[]).slice(),src=arr.filter(function(x){return x.id===state.selectedField})[0];if(!src)return;var cp=JSON.parse(JSON.stringify(src));cp.id=uid();cp.label+=" (نسخه)";arr.push(cp);saveFields(arr);state.selectedField=cp.id;drawCanvas();drawProps();};
+  };
+  var oldFieldPreview=fieldPreview;
+  fieldPreview=function(f){
+    if(f.type==="yesno")return '<select disabled><option>بله</option><option>خیر</option></select>';
+    if(f.type==="note"||f.type==="title")return '<div style="padding:8px;background:var(--bg);border-radius:8px">'+esc(f.placeholder||"متن توضیحی")+'</div>';
+    if(f.type==="file")return '<input type="file" disabled/>';
+    if(f.type==="likert")return '<select disabled><option>کاملاً مخالفم</option><option>مخالفم</option><option>نظری ندارم</option><option>موافقم</option><option>کاملاً موافقم</option></select>';
+    if(f.type==="stars")return '<div style="color:#d97706">☆ ☆ ☆ ☆ ☆</div>';
+    if(f.type==="phone"||f.type==="name"||f.type==="url"||f.type==="address"||f.type==="postal"||f.type==="money"||f.type==="time")return '<input disabled placeholder="'+esc(f.placeholder||"")+'"/>';
+    return oldFieldPreview(f);
+  };
+  var oldPublicField=publicField;
+  publicField=function(f){
+    var req=f.required?"required":"";
+    if(f.type==="yesno")return '<select name="'+f.id+'" '+req+'><option value="">انتخاب کنید</option><option>بله</option><option>خیر</option></select>';
+    if(f.type==="note"||f.type==="title")return '<p style="color:var(--t2)">'+esc(f.placeholder||f.label)+'</p>';
+    if(f.type==="file")return '<input type="file" name="'+f.id+'" '+req+'/>';
+    if(f.type==="likert")return '<select name="'+f.id+'" '+req+'><option value="">انتخاب کنید</option><option>کاملاً مخالفم</option><option>مخالفم</option><option>نظری ندارم</option><option>موافقم</option><option>کاملاً موافقم</option></select>';
+    if(f.type==="stars")return '<select name="'+f.id+'" '+req+'><option value="">امتیاز</option><option>۱</option><option>۲</option><option>۳</option><option>۴</option><option>۵</option></select>';
+    var types={phone:"tel",name:"text",url:"url",address:"text",postal:"text",money:"number",time:"time"};
+    if(types[f.type])return '<input type="'+types[f.type]+'" name="'+f.id+'" placeholder="'+esc(f.placeholder||"")+'" '+req+'/>';
+    return oldPublicField(f);
+  };
+  /* ارزیابی خودکار آزمون */
+  var oldTryPublic=tryPublic;
+  tryPublic=function(){
+    var result=oldTryPublic();
+    var form=document.getElementById("pubForm");
+    if(form){
+      var fid=new URLSearchParams(location.search).get("f"),d=load(),p=d.projects.filter(function(x){return x.publicId===fid})[0];
+      if(p&&p.type==="quiz"){
+        var original=form.onsubmit;
+        form.onsubmit=function(e){
+          if(original)original.call(this,e);
+          var latest=load(),responses=latest.responses;
+          var r=responses.length?responses[responses.length-1]:null;
+          if(!r||r.projectId!==p.id)return;
+          var score=0,max=0,details=[];
+          (p.fields||[]).forEach(function(f){
+            if(!f.correctAnswer)return;
+            var pts=Number(f.points)||1;max+=pts;
+            var val=r.answers&&r.answers[f.id]||"",ok=String(val).trim()===String(f.correctAnswer).trim();
+            if(ok)score+=pts;
+            details.push({fieldId:f.id,correct:ok,points:ok?pts:0});
+          });
+          r.score=score;r.maxScore=max;r.grading=details;save(latest);
+          var msg=document.querySelector("#pubCard .okbox p");
+          if(msg)msg.textContent=max?"نمره شما: "+score+" از "+max:"پاسخ شما ثبت شد. برای این آزمون کلید تصحیح تعریف نشده است.";
+        };
+      }
+    }
+    return result;
+  };
+  var oldRenderResponses=renderResponses;
+  renderResponses=function(el,u){
+    oldRenderResponses(el,u);
+    var d=load(),ps=ownedProjects(u),rs=d.responses.filter(function(r){return ps.some(function(p){return p.id===r.projectId})});
+    var box=el.querySelector(".card");
+    if(box&&rs.length){
+      var controls=document.createElement("div");controls.style.marginBottom="12px";
+      controls.innerHTML='<button type="button" class="btn btn-s btn-sm" id="allCsv">خروجی همه پاسخ‌ها (CSV)</button>';
+      box.insertBefore(controls,box.firstChild);
+      document.getElementById("allCsv").onclick=function(){
+        var lines=[["پروژه","شناسه","زمان","نمره"].map(csvCell).join(",")];
+        rs.forEach(function(r){var p=ps.filter(function(x){return x.id===r.projectId})[0];lines.push([p?p.title:"",r.id,r.at,r.score==null?"":r.score].map(csvCell).join(","))});
+        downloadText("azmoonino-all-responses.csv","\uFEFF"+lines.join("\r\n"),"text/csv;charset=utf-8");
+      };
+    }
+  };
+  /* قابلیت‌های تکمیلی صفحه جزئیات پروژه */
+  var oldRenderProject=renderProject;
+  renderProject=function(el,u){
+    oldRenderProject(el,u);
+    var p=getProj();if(!p)return;
+    var head=el.querySelector(".pt");
+    if(head){
+      var bar=document.createElement("div");bar.className="ma";
+      bar.innerHTML='<button class="btn btn-s btn-sm" id="renameProject">تغییر نام</button><button class="btn btn-s btn-sm" id="duplicateProject">ساخت کپی</button><button class="btn btn-s btn-sm" id="exportProject">خروجی پاسخ‌ها</button>';
+      head.parentNode.appendChild(bar);
+      document.getElementById("renameProject").onclick=function(){var n=prompt("عنوان جدید",p.title);if(!n||!n.trim())return;var d=load();d.projects.forEach(function(x){if(x.id===p.id){x.title=n.trim();x.updatedAt=now()}});save(d);render()};
+      document.getElementById("duplicateProject").onclick=function(){var d=load(),cp=JSON.parse(JSON.stringify(p));cp.id=uid();cp.publicId=uid().slice(0,10);cp.title+=" (کپی)";cp.status="draft";cp.createdAt=cp.updatedAt=now();d.projects.push(cp);save(d);state.builderId=cp.id;toast("نسخه کپی ساخته شد","ok");go("builder")};
+      document.getElementById("exportProject").onclick=function(){exportResponses(p.id)};
+    }
+  };
+  /* تم روشن/تاریک و راه دسترسی سریع به راهنما */
+  if(!document.getElementById("themeBtn")){
+    var tb=document.createElement("button");tb.type="button";tb.id="themeBtn";tb.className="iconb";tb.title="تغییر حالت نمایش";tb.textContent="◐";
+    document.querySelector(".top-r").insertBefore(tb,document.getElementById("btnNotif"));
+    tb.onclick=function(){var dark=document.body.classList.toggle("dark-mode");localStorage.setItem("azm_theme",dark?"dark":"light")};
+    if(localStorage.getItem("azm_theme")==="dark")document.body.classList.add("dark-mode");
+  }
+  var extraStyle=document.createElement("style");
+  extraStyle.textContent='.dark-mode{--bg:#0b1220;--card:#111c2e;--side:#070d18;--t:#e5edf8;--t2:#aab8cc;--mu:#8292aa;--bd:#26364d;color:var(--t)}.dark-mode .card,.dark-mode .stat,.dark-mode .bp,.dark-mode .fi,.dark-mode .top,.dark-mode #modal .box,.dark-mode .pubc{background:#111c2e;color:var(--t);border-color:var(--bd)}.dark-mode .btn-s,.dark-mode .flib button{background:#17243a;color:var(--t);border-color:var(--bd)}.dark-mode input,.dark-mode textarea,.dark-mode select{background:#0b1424;color:var(--t);border-color:var(--bd)}';
+  document.head.appendChild(extraStyle);
+
+
+  /* === اصلاح نهایی تعامل‌ها، گزینه‌ها، پیوست‌ها و پوسته === */
+  var THEME_PALETTES={blue:{p:'#2563eb',ph:'#1d4ed8',pl:'#dbeafe'},purple:{p:'#7c3aed',ph:'#6d28d9',pl:'#ede9fe'},green:{p:'#059669',ph:'#047857',pl:'#d1fae5'},rose:{p:'#e11d48',ph:'#be123c',pl:'#ffe4e6'},amber:{p:'#d97706',ph:'#b45309',pl:'#fef3c7'}};
+  function applyAzTheme(){
+    var mode=localStorage.getItem('azm_theme_mode')||'light';
+    var color=localStorage.getItem('azm_theme_color')||'blue';
+    document.body.classList.toggle('dark-mode',mode==='dark');
+    var c=THEME_PALETTES[color]||THEME_PALETTES.blue;
+    document.documentElement.style.setProperty('--p',c.p);
+    document.documentElement.style.setProperty('--ph',c.ph);
+    document.documentElement.style.setProperty('--pl',c.pl);
+    var b=document.getElementById('themeBtn');if(b)b.textContent=mode==='dark'?'☀️':'🌙';
+  }
+  function setAzTheme(mode,color){
+    if(mode)localStorage.setItem('azm_theme_mode',mode);
+    if(color)localStorage.setItem('azm_theme_color',color);
+    applyAzTheme();
+  }
+  if(!FIELD_TYPES.some(function(x){return x.t==='image'}))FIELD_TYPES.push({t:'image',l:'بارگذاری تصویر',i:'🖼️'});
+  /* گزینه‌ها به شکل کارت‌های جدا؛ هر گزینه می‌تواند چندخطی باشد. */
+  drawProps=function(){
+    var box=document.getElementById('props'),p=getProj();if(!box||!p)return;
+    var f=(p.fields||[]).filter(function(x){return x.id===state.selectedField})[0];
+    if(!f){box.innerHTML='<span style="color:var(--mu)">یک فیلد را انتخاب کنید</span>';return;}
+    var optionType=['select','radio','checkbox'].indexOf(f.type)>=0;
+    var opts=(f.options||[]);
+    var html='<div class="fg"><label>عنوان سؤال / فیلد</label><input id="fpLabel" value="'+esc(f.label||'')+'" /></div>'+
+      '<div class="fg"><label>توضیح یا متن راهنما</label><textarea id="fpPh" rows="2">'+esc(f.placeholder||'')+'</textarea></div>'+
+      '<div class="fg"><label><input type="checkbox" id="fpReq" '+(f.required?'checked':'')+' /> پاسخ الزامی</label></div>';
+    if(optionType){
+      html+='<div class="fg"><label>گزینه‌های پاسخ</label><div id="optionRows">';
+      opts.forEach(function(o,i){html+='<div class="option-row" data-index="'+i+'"><span class="option-num">'+(i+1)+'</span><textarea rows="2" class="option-value" aria-label="متن گزینه '+(i+1)+'">'+esc(o)+'</textarea><button type="button" class="btn btn-d btn-sm option-remove" title="حذف گزینه">حذف</button></div>';});
+      html+='</div><button type="button" class="btn btn-s btn-sm" id="addOption">＋ افزودن گزینه</button></div>';
+    }
+    if(f.type==='file'||f.type==='image'){
+      html+='<div class="fg"><label>نوع فایل قابل قبول</label><select id="fpAccept"><option value="*/*">همه فایل‌ها</option><option value="image/*">فقط تصویر</option><option value=".pdf">PDF</option><option value="image/*,.pdf,.doc,.docx">تصویر، PDF و Word</option></select></div>'+
+      '<div class="fg"><label><input type="checkbox" id="fpMultiple" '+(f.multiple?'checked':'')+' /> امکان انتخاب چند فایل</label></div>';
+    }
+    html+='<div class="fg"><label>تصویر همراه سؤال (اختیاری)</label><input type="file" id="fpImage" accept="image/*"/><small style="color:var(--mu)">تصویر سؤال در خود فایل ذخیره می‌شود؛ حجم زیاد ممکن است محدودیت ذخیره‌سازی مرورگر ایجاد کند.</small>'+(f.imageData?'<div style="margin-top:8px"><img src="'+f.imageData+'" style="max-width:100%;max-height:140px;border-radius:8px"><button type="button" class="btn btn-d btn-sm" id="removePromptImage">حذف تصویر سؤال</button></div>':'')+'</div>';
+    if(p.type==='quiz'&&['radio','select','text','number','checkbox'].indexOf(f.type)>=0){
+      html+='<div class="fg"><label>پاسخ صحیح</label>';
+      if(f.type==='checkbox'){
+        var correctArr=Array.isArray(f.correctAnswer)?f.correctAnswer:(f.correctAnswer?String(f.correctAnswer).split('||'):[]);
+        html+='<select id="fpCorrect" multiple size="'+Math.max(2,Math.min(5,opts.length))+'">'+opts.map(function(o){return '<option value="'+esc(o)+'" '+(correctArr.indexOf(o)>=0?'selected':'')+'>'+esc(o)+'</option>';}).join('')+'</select><small style="color:var(--mu)">برای پاسخ صحیح می‌توانید چند گزینه را انتخاب کنید.</small>';
+      }else if(optionType){html+='<select id="fpCorrect"><option value="">انتخاب پاسخ صحیح</option>'+opts.map(function(o){return '<option value="'+esc(o)+'" '+(f.correctAnswer===o?'selected':'')+'>'+esc(o)+'</option>';}).join('')+'</select>';}
+      else html+='<input id="fpCorrect" value="'+esc(f.correctAnswer||'')+'" placeholder="پاسخ دقیق صحیح"/>';
+      html+='</div><div class="fg"><label>نمره سؤال</label><input id="fpPoints" type="number" min="0" step="0.25" value="'+(Number(f.points)||1)+'"/></div>';
+    }
+    html+='<div class="ma"><button type="button" class="btn btn-s btn-sm" id="fpDuplicate">کپی فیلد</button></div>';
+    box.innerHTML=html;
+    document.getElementById('fpLabel').onchange=function(){setProp('label',this.value);};
+    document.getElementById('fpPh').onchange=function(){setProp('placeholder',this.value);};
+    document.getElementById('fpReq').onchange=function(){setProp('required',this.checked);};
+    if(optionType){
+      function commitOptions(){var arr=[];box.querySelectorAll('.option-value').forEach(function(x){arr.push(x.value);});setProp('options',arr);}
+      box.querySelectorAll('.option-value').forEach(function(x){x.onchange=commitOptions;});
+      box.querySelectorAll('.option-remove').forEach(function(b){b.onclick=function(){var idx=Number(b.closest('.option-row').getAttribute('data-index'));var a=(getProj().fields||[]).filter(function(x){return x.id===state.selectedField})[0].options.slice();a.splice(idx,1);setProp('options',a);drawProps();};});
+      document.getElementById('addOption').onclick=function(){var a=(getProj().fields||[]).filter(function(x){return x.id===state.selectedField})[0].options.slice();a.push('گزینه جدید');setProp('options',a);drawProps();};
+    }
+    var acc=document.getElementById('fpAccept');if(acc){acc.value=f.accept|| (f.type==='image'?'image/*':'*/*');acc.onchange=function(){setProp('accept',this.value);};}
+    var mult=document.getElementById('fpMultiple');if(mult)mult.onchange=function(){setProp('multiple',this.checked);};
+    var im=document.getElementById('fpImage');if(im)im.onchange=function(){var file=this.files&&this.files[0];if(!file)return;if(!file.type.startsWith('image/'))return toast('فقط تصویر انتخاب کنید','er');readImageCompressed(file,900,0.72).then(function(data){setProp('imageData',data);drawProps();toast('تصویر سؤال اضافه شد','ok');}).catch(function(){toast('خواندن تصویر ناموفق بود','er');});};
+    var ri=document.getElementById('removePromptImage');if(ri)ri.onclick=function(){setProp('imageData','');drawProps();};
+    var c=document.getElementById('fpCorrect');if(c)c.onchange=function(){setProp('correctAnswer',c.multiple?Array.prototype.map.call(c.selectedOptions,function(o){return o.value;}):this.value);};
+    var pt=document.getElementById('fpPoints');if(pt)pt.onchange=function(){setProp('points',Math.max(0,Number(this.value)||0));};
+    var du=document.getElementById('fpDuplicate');if(du)du.onclick=function(){var z=getProj(),arr=(z.fields||[]).slice(),src=arr.filter(function(x){return x.id===state.selectedField})[0];if(!src)return;var cp=JSON.parse(JSON.stringify(src));cp.id=uid();cp.label+=' (نسخه)';arr.push(cp);saveFields(arr);state.selectedField=cp.id;drawCanvas();drawProps();toast('فیلد کپی شد','ok');};
+  };
+  function readImageCompressed(file,maxSide,quality){
+    return new Promise(function(resolve,reject){var fr=new FileReader();fr.onerror=reject;fr.onload=function(){var img=new Image();img.onerror=reject;img.onload=function(){var scale=Math.min(1,maxSide/Math.max(img.width,img.height));var c=document.createElement('canvas');c.width=Math.max(1,Math.round(img.width*scale));c.height=Math.max(1,Math.round(img.height*scale));c.getContext('2d').drawImage(img,0,0,c.width,c.height);resolve(c.toDataURL('image/jpeg',quality));};img.src=fr.result;};fr.readAsDataURL(file);});
+  }
+  fieldPreview=function(f){
+    if(f.imageData)return '<img src="'+f.imageData+'" alt="تصویر سؤال" style="display:block;max-width:100%;max-height:130px;object-fit:contain;margin:6px 0;border-radius:8px">'+(f.type==='image'?'<input type="file" disabled accept="image/*">':(f.type==='file'?'<input type="file" disabled>':oldFieldPreview(f)));
+    if(f.type==='image')return '<input type="file" disabled accept="image/*">';
+    if(f.type==='file')return '<input type="file" disabled>';
+    return oldFieldPreview(f);
+  };
+  publicField=function(f){
+    var id=esc(f.id),req=f.required?'required':'';
+    var promptImage=f.imageData?'<img src="'+f.imageData+'" alt="تصویر سؤال" style="display:block;max-width:100%;max-height:280px;object-fit:contain;margin:8px auto;border-radius:10px">':'';
+    if(f.type==='title')return '<h3>'+esc(f.label)+'</h3>'+(f.placeholder?'<p>'+esc(f.placeholder)+'</p>':'');
+    if(f.type==='note')return '<div class="note-field">'+esc(f.placeholder||f.label)+'</div>';
+    if(f.type==='image'||f.type==='file')return promptImage+'<input type="file" name="'+id+'" data-upload="1" '+(f.type==='image'?'accept="image/*"':('accept="'+esc(f.accept||'*/*')+'"'))+' '+(f.multiple?'multiple':'')+' '+req+' />';
+    var base=oldPublicField(f);
+    if(f.type==='radio'||f.type==='checkbox'||f.type==='select')return promptImage+base;
+    return promptImage+base;
+  };
+  /* فرم عمومی: پاسخ‌ها و پیوست‌ها واقعاً خوانده و ذخیره می‌شوند. */
+  tryPublic=function(){
+    var fid=new URLSearchParams(location.search).get('f');if(!fid)return false;
+    document.getElementById('auth').style.display='none';document.getElementById('app').classList.remove('on');
+    var view=document.getElementById('public');view.classList.add('on');var db=load();
+    var p=db.projects.filter(function(x){return x.publicId===fid})[0];
+    if(!p){view.innerHTML='<div class="pubc"><div class="empty">فرم یافت نشد.</div></div>';return true;}
+    if(p.status!=='published'){view.innerHTML='<div class="pubc"><div class="empty">این فرم در حال حاضر باز نیست.</div></div>';return true;}
+    var flds=p.fields||[];
+    view.innerHTML='<div class="pubc" id="pubCard"><h1>'+esc(p.title)+'</h1><div class="ds">'+esc(p.description||'')+'</div><form id="pubForm">'+flds.map(function(f){return '<div class="pf"><label>'+esc(f.label)+(f.required?' <span style="color:var(--err)">*</span>':'')+'</label>'+publicField(f)+'</div>';}).join('')+'<button type="submit" class="btn btn-p" style="margin-top:8px">ثبت پاسخ</button></form></div>';
+    var form=document.getElementById('pubForm');
+    form.onsubmit=function(e){
+      e.preventDefault();var submit=form.querySelector('[type=submit]');submit.disabled=true;submit.textContent='در حال ثبت…';
+      (async function(){
+        try{
+          var answers={};
+          for(var i=0;i<flds.length;i++){
+            var f=flds[i];if(f.type==='title'||f.type==='note')continue;
+            if(f.type==='checkbox'){
+              var checks=form.querySelectorAll('input[name="'+f.id+'"]:checked');answers[f.id]=Array.prototype.map.call(checks,function(x){return x.value;});
+            }else if(f.type==='radio'){
+              var checked=form.querySelector('input[name="'+f.id+'"]:checked');answers[f.id]=checked?checked.value:'';
+            }else if(f.type==='file'||f.type==='image'){
+              var input=form.querySelector('input[name="'+f.id+'"]'),files=input?Array.prototype.slice.call(input.files||[]):[];var arr=[];
+              for(var j=0;j<files.length;j++){
+                var file=files[j];if(file.size>1500000)throw new Error('حجم هر فایل باید کمتر از ۱٫۵ مگابایت باشد.');
+                var data=file.type.startsWith('image/')?await readImageCompressed(file,1000,0.72):await new Promise(function(resolve,reject){var r=new FileReader();r.onload=function(){resolve(r.result)};r.onerror=reject;r.readAsDataURL(file);});
+                arr.push({name:file.name,type:file.type,size:file.size,data:data});
+              }
+              answers[f.id]=arr;
+            }else{var inp=form.elements[f.id];answers[f.id]=inp?inp.value:'';}
+            if(f.required && (answers[f.id]==='' || answers[f.id]==null || (Array.isArray(answers[f.id])&&answers[f.id].length===0)))throw new Error('لطفاً فیلد «'+f.label+'» را تکمیل کنید.');
+          }
+          var latest=load(),response={id:uid(),projectId:p.id,answers:answers,at:now()};
+          if(p.type==='quiz'){
+            var score=0,max=0,grading=[];
+            flds.forEach(function(f){if(f.correctAnswer==null||f.correctAnswer===''||(Array.isArray(f.correctAnswer)&&!f.correctAnswer.length))return;var pts=Number(f.points)||1;max+=pts;var val=answers[f.id],ok=false;
+              if(f.type==='checkbox'){var a=Array.isArray(val)?val.slice().sort():[],b=(Array.isArray(f.correctAnswer)?f.correctAnswer:String(f.correctAnswer).split('||')).slice().sort();ok=a.length===b.length&&a.every(function(x,i){return x===b[i];});}
+              else ok=String(val==null?'':val).trim()===String(f.correctAnswer).trim();
+              if(ok)score+=pts;grading.push({fieldId:f.id,correct:ok,points:ok?pts:0});
+            });response.score=score;response.maxScore=max;response.grading=grading;
+          }
+          latest.responses.push(response);
+          latest.notifs.push({id:uid(),userId:p.ownerId,title:'پاسخ جدید',body:'پاسخ جدید برای «'+p.title+'»',read:false,at:now()});
+          if(!save(latest))throw new Error('ذخیره پاسخ ممکن نشد. ممکن است فضای ذخیره‌سازی مرورگر کافی نباشد.');
+          var resultText=p.type==='quiz'?(response.maxScore?'نمره شما: '+response.score+' از '+response.maxScore:'پاسخ ثبت شد؛ برای سؤال‌ها کلید تصحیح تعیین نشده است.'):'از مشارکت شما سپاسگزاریم.';
+          document.getElementById('pubCard').innerHTML='<div class="okbox"><div class="ck">✓</div><h2>پاسخ ثبت شد</h2><p style="color:var(--t2);margin-top:6px">'+esc(resultText)+'</p></div>';
+        }catch(err){toast(err.message||'ثبت پاسخ ناموفق بود','er');submit.disabled=false;submit.textContent='ثبت پاسخ';}
+      })();
+    };
+    return true;
+  };
+  /* تنظیمات ظاهری و تم‌های رنگی */
+  var baseRenderSettings=renderSettings;
+  renderSettings=function(el,u){
+    baseRenderSettings(el,u);
+    var card=el.querySelector('.card');if(!card)return;
+    var wrap=document.createElement('div');wrap.className='card theme-settings';wrap.style.marginTop='14px';
+    var mode=localStorage.getItem('azm_theme_mode')||'light',color=localStorage.getItem('azm_theme_color')||'blue';
+    wrap.innerHTML='<div class="ct">ظاهر و پوسته</div><div class="fg"><label>حالت نمایش</label><select id="themeMode"><option value="light">روشن</option><option value="dark">تاریک</option></select></div><div class="fg"><label>رنگ اصلی سامانه</label><select id="themeColor"><option value="blue">آبی</option><option value="purple">بنفش</option><option value="green">سبز</option><option value="rose">صورتی</option><option value="amber">کهربایی</option></select></div><p style="font-size:12px;color:var(--mu)">انتخاب‌ها در همین مرورگر ذخیره می‌شوند.</p>';
+    card.parentNode.insertBefore(wrap,card.nextSibling);document.getElementById('themeMode').value=mode;document.getElementById('themeColor').value=color;
+    document.getElementById('themeMode').onchange=function(){setAzTheme(this.value,null);};
+    document.getElementById('themeColor').onchange=function(){setAzTheme(null,this.value);};
+  };
+  /* نمایش پیوست‌های دریافت‌شده در صفحه جزئیات پروژه */
+  var priorProjectRender=renderProject;
+  renderProject=function(el,u){
+    priorProjectRender(el,u);var p=getProj();if(!p)return;var d=load();
+    var rs=d.responses.filter(function(r){return r.projectId===p.id;});
+    var items=[];rs.forEach(function(r){(p.fields||[]).forEach(function(f){var v=r.answers&&r.answers[f.id];if(Array.isArray(v))v.forEach(function(file){if(file&&file.data)items.push({file:file,label:f.label,at:r.at});});});});
+    if(items.length){var box=document.createElement('div');box.className='card';box.style.marginTop='14px';box.innerHTML='<div class="ct">فایل‌های بارگذاری‌شده</div>'+items.map(function(x){var isImg=(x.file.type||'').startsWith('image/');return '<div class="attachment-item">'+(isImg?'<img src="'+x.file.data+'" alt="'+esc(x.file.name)+'">':'<span class="attachment-icon">📎</span>')+'<div><b>'+esc(x.file.name)+'</b><small>'+esc(x.label)+' · '+faDate(x.at)+'</small><a download="'+esc(x.file.name)+'" href="'+x.file.data+'">دریافت فایل</a></div></div>';}).join('');el.appendChild(box);}
+  };
+  csvCell=function(v){if(Array.isArray(v))v=v.map(function(x){return x&&x.name?x.name:typeof x==='object'?JSON.stringify(x):x;}).join(' | ');else if(v&&typeof v==='object')v=v.name||JSON.stringify(v);return '"'+String(v==null?'':v).replace(/"/g,'""')+'"';};
+  var oldSumResp=sumResp;sumResp=function(r,p){var out=oldSumResp(r,p);(p.fields||[]).forEach(function(f){var v=r.answers&&r.answers[f.id];if(Array.isArray(v)&&v.length&&v[0]&&v[0].name){out=out.replace('[object Object]',v.map(function(x){return x.name;}).join('، '));}});return out;};
+  /* تم سریع در نوار بالا */
+  var themeButton=document.getElementById('themeBtn');if(themeButton)themeButton.onclick=function(){var next=(localStorage.getItem('azm_theme_mode')||'light')==='dark'?'light':'dark';setAzTheme(next,null);};
+  applyAzTheme();
+  var finalStyle=document.createElement('style');
+  finalStyle.textContent='.option-row{display:flex;align-items:flex-start;gap:7px;margin:7px 0;padding:8px;border:1px solid var(--bd);border-radius:10px;background:var(--bg)}.option-row textarea{flex:1;min-width:0;resize:vertical}.option-num{background:var(--pl);color:var(--p);border-radius:7px;padding:5px 9px;font-weight:700}.option-row .btn{flex-shrink:0}.attachment-item{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--bd)}.attachment-item img{width:64px;height:64px;object-fit:cover;border-radius:8px}.attachment-item small{display:block;color:var(--mu);font-size:11px}.attachment-item a{display:inline-block;color:var(--p);font-size:12px;margin-top:3px}.attachment-icon{font-size:28px}.note-field{background:var(--bg);padding:12px;border-radius:9px;color:var(--t2)}.pf{overflow-wrap:anywhere}.pf input[type=file]{padding:9px;background:var(--bg)}.dark-mode #npanel .hd{background:#111c2e}.dark-mode .option-row{background:#0b1424}';
+  document.head.appendChild(finalStyle);
+
+
+  /* === بازطراحی مسیر ساخت پروژه/آزمون و حذف بخش‌های غیرمرتبط === */
+  openCreate = function(forceType){
+    var preferred = forceType || (state.page === "quizzes" ? "quiz" : (state.page === "forms" ? "form" : "form"));
+    openModal(
+      '<h3>'+(preferred==='quiz'?'ساخت آزمون جدید':'ساخت پروژه جدید')+'</h3>'+
+      '<div class="fg"><label>عنوان</label><input id="npTitle" type="text" placeholder="'+(preferred==='quiz'?'مثلاً آزمون فصل اول':'مثلاً فرم ثبت‌نام')+'" /></div>'+
+      '<div class="fg"><label>نوع پروژه</label><select id="npType">'+
+      '<option value="form" '+(preferred==='form'?'selected':'')+'>فرم</option>'+
+      '<option value="quiz" '+(preferred==='quiz'?'selected':'')+'>آزمون</option>'+
+      '<option value="survey" '+(preferred==='survey'?'selected':'')+'>نظرسنجی</option></select></div>'+
+      '<div class="fg"><label>توضیحات (اختیاری)</label><textarea id="npDesc" rows="3" placeholder="توضیح کوتاهی درباره پروژه"></textarea></div>'+
+      '<div class="ma"><button type="button" class="btn btn-p" id="npGo" style="width:auto">'+(preferred==='quiz'?'ساخت آزمون و ورود به آزمون‌ساز':'ساخت و ورود به ویرایشگر')+'</button>'+
+      '<button type="button" class="btn btn-s" id="npCancel">انصراف</button></div>'
+    );
+    var cancel=document.getElementById("npCancel");
+    var create=document.getElementById("npGo");
+    if(cancel) cancel.onclick=function(e){e.preventDefault();closeModal();};
+    if(create) create.onclick=function(e){
+      e.preventDefault();
+      var titleEl=document.getElementById("npTitle");
+      var typeEl=document.getElementById("npType");
+      var descEl=document.getElementById("npDesc");
+      var title=titleEl ? titleEl.value.trim() : "";
+      var type=typeEl ? typeEl.value : preferred;
+      var desc=descEl ? descEl.value.trim() : "";
+      if(!title){toast("لطفاً عنوان را وارد کنید.","er");if(titleEl)titleEl.focus();return;}
+      var currentUser=user();
+      if(!currentUser){toast("نشست کاربری معتبر نیست؛ دوباره وارد شوید.","er");closeModal();return;}
+      var db=load();
+      if(!Array.isArray(db.projects))db.projects=[];
+      var p={id:uid(),ownerId:currentUser.id,title:title,type:type,description:desc,status:"draft",fields:[],publicId:uid().slice(0,10),createdAt:now(),updatedAt:now()};
+      db.projects.push(p);
+      if(!Array.isArray(db.notifs))db.notifs=[];
+      db.notifs.push({id:uid(),userId:currentUser.id,title:type==="quiz"?"آزمون ساخته شد":"پروژه ساخته شد",body:"«"+title+"» با موفقیت ایجاد شد.",read:false,at:now()});
+      if(save(db)===false){toast("ذخیره پروژه انجام نشد. فضای ذخیره‌سازی مرورگر را بررسی کنید.","er");return;}
+      state.builderId=p.id;
+      state.selectedField=null;
+      closeModal();
+      toast(type==="quiz"?"آزمون ساخته شد":"پروژه ساخته شد","ok");
+      go("builder");
+    };
+    if(document.getElementById("npTitle"))document.getElementById("npTitle").focus();
+  };
+
+  /* دکمه‌های فهرست همیشه به مسیر ساخت درست وصل باشند. */
+  var _renderProjectsForCreate = renderProjects;
+  renderProjects = function(el,u){
+    _renderProjectsForCreate(el,u);
+    var b=el.querySelector("#listNew");
+    if(b){
+      if(state.page==="quizzes"){b.textContent="+ ساخت آزمون";b.onclick=function(){openCreate("quiz");};}
+      else if(state.page==="forms"){b.textContent="+ ساخت فرم";b.onclick=function(){openCreate("form");};}
+      else b.onclick=function(){openCreate();};
+    }
+  };
+
+  /* حذف بخش‌های نامرتبط با فرم‌ساز و آزمون‌ساز از منو */
+  (function(){
+    var navRoot=document.getElementById("nav");
+    if(navRoot){
+      ["notifs","support","contacts","groups","classes"].forEach(function(key){
+        var item=navRoot.querySelector('[data-p="'+key+'"]');
+        if(item)item.remove();
+      });
+    }
+    /* اعلان‌ها و پشتیبانی از نوار اصلی حذف شده‌اند؛ کدهای قدیمی آن‌ها غیرفعال می‌مانند. */
+    var notif=document.getElementById("btnNotif");
+    if(notif){notif.style.display="none";notif.setAttribute("aria-hidden","true");}
+    var panel=document.getElementById("npanel");
+    if(panel)panel.style.display="none";
+  })();
+
+  /* حذف کارت آمار اعلان‌ها از داشبورد */
+  var _renderDashNoComms=renderDash;
+  renderDash=function(el,u){
+    _renderDashNoComms(el,u);
+    Array.prototype.forEach.call(el.querySelectorAll(".stat"),function(card){
+      var label=card.querySelector(".l");
+      if(label && /اعلان/.test(label.textContent))card.remove();
+    });
+  };
+
+  /* رویدادهای مطمئن برای دکمه‌های ساخت، حتی پس از بازترسیم صفحه */
+  var newProjectButton=document.getElementById("btnNew");
+  if(newProjectButton)newProjectButton.onclick=function(e){e.preventDefault();openCreate();};
+
+  document.getElementById("btnLogin").onclick = doLogin;
+  document.getElementById("btnReg").onclick = doRegister;
+  document.getElementById("goReg").onclick = function (e) { e.preventDefault(); showReg(); };
+  document.getElementById("goLogin").onclick = function (e) { e.preventDefault(); showLogin(); };
+  document.getElementById("inPass").onkeydown = function (e) { if (e.key === "Enter") doLogin(); };
+  document.getElementById("regPass").onkeydown = function (e) { if (e.key === "Enter") doRegister(); };
+  document.getElementById("btnOut").onclick = doLogout;
+  document.getElementById("btnNew").onclick = function(e){ e.preventDefault(); openCreate(); };
+  document.getElementById("btnNotif").onclick = toggleNotif;
+  document.getElementById("btnMenu").onclick = function () {
+    document.getElementById("side").classList.toggle("open");
+  };
+  document.getElementById("nav").onclick = function (e) {
+    var btn = e.target.closest(".ni");
+    if (!btn) return;
+    go(btn.getAttribute("data-p"));
+  };
+  document.getElementById("modal").onclick = function (e) {
+    if (e.target.id === "modal") closeModal();
+  };
+  if (tryPublic()) {
+  } else if (user()) {
+    enterApp();
+  } else {
+    document.getElementById("auth").style.display = "flex";
+  }
+
+
+  /* امکانات حرفه‌ای آزمون: تنظیمات، پوسته، زمان‌بندی، تصحیح و پیش‌نمایش */
+  var AZ_THEMES = {
+    classic:{name:'کلاسیک',bg:'linear-gradient(160deg,#f0f4ff 0%,#f8fafc 100%)',card:'#ffffff',ink:'#0f172a',accent:'#2563eb',accentSoft:'#dbeafe',headerBg:'#2563eb',btnText:'#fff',shadow:'0 12px 40px rgba(37,99,235,.12)',radius:'16px',font:'Tahoma, system-ui, sans-serif'},
+    ocean:{name:'اقیانوس',bg:'linear-gradient(165deg,#e0f2fe 0%,#f0f9ff 50%,#ecfeff 100%)',card:'#ffffff',ink:'#0c4a6e',accent:'#0284c7',accentSoft:'#e0f2fe',headerBg:'linear-gradient(135deg,#0ea5e9,#0284c7)',btnText:'#fff',shadow:'0 12px 40px rgba(14,165,233,.15)',radius:'18px',font:'Tahoma, system-ui, sans-serif'},
+    forest:{name:'جنگلی',bg:'linear-gradient(160deg,#ecfdf5 0%,#f0fdf4 100%)',card:'#ffffff',ink:'#14532d',accent:'#059669',accentSoft:'#d1fae5',headerBg:'linear-gradient(135deg,#10b981,#059669)',btnText:'#fff',shadow:'0 12px 40px rgba(5,150,105,.14)',radius:'16px',font:'Tahoma, system-ui, sans-serif'},
+    sunset:{name:'غروب',bg:'linear-gradient(165deg,#fff7ed 0%,#fffbeb 50%,#fef3c7 100%)',card:'#ffffff',ink:'#7c2d12',accent:'#ea580c',accentSoft:'#ffedd5',headerBg:'linear-gradient(135deg,#f97316,#ea580c)',btnText:'#fff',shadow:'0 12px 40px rgba(234,88,12,.14)',radius:'18px',font:'Tahoma, system-ui, sans-serif'},
+    lavender:{name:'یاسی',bg:'linear-gradient(160deg,#f5f3ff 0%,#faf5ff 100%)',card:'#ffffff',ink:'#4c1d95',accent:'#7c3aed',accentSoft:'#ede9fe',headerBg:'linear-gradient(135deg,#8b5cf6,#7c3aed)',btnText:'#fff',shadow:'0 12px 40px rgba(124,58,237,.14)',radius:'16px',font:'Tahoma, system-ui, sans-serif'},
+    dark:{name:'تیره حرفه‌ای',bg:'linear-gradient(165deg,#0f172a 0%,#1e293b 100%)',card:'#1e293b',ink:'#f1f5f9',accent:'#60a5fa',accentSoft:'#1e3a5f',headerBg:'linear-gradient(135deg,#3b82f6,#2563eb)',btnText:'#fff',shadow:'0 12px 40px rgba(0,0,0,.4)',radius:'16px',font:'Tahoma, system-ui, sans-serif'},
+    rose:{name:'رز',bg:'linear-gradient(160deg,#fff1f2 0%,#fdf2f8 100%)',card:'#ffffff',ink:'#881337',accent:'#e11d48',accentSoft:'#ffe4e6',headerBg:'linear-gradient(135deg,#f43f5e,#e11d48)',btnText:'#fff',shadow:'0 12px 40px rgba(225,29,72,.14)',radius:'18px',font:'Tahoma, system-ui, sans-serif'},
+    amber:{name:'کهربایی',bg:'linear-gradient(165deg,#fffbeb 0%,#fef3c7 100%)',card:'#ffffff',ink:'#78350f',accent:'#d97706',accentSoft:'#fef3c7',headerBg:'linear-gradient(135deg,#f59e0b,#d97706)',btnText:'#fff',shadow:'0 12px 40px rgba(217,119,6,.14)',radius:'16px',font:'Tahoma, system-ui, sans-serif'},
+    midnight:{name:'نیمه‌شب',bg:'linear-gradient(165deg,#020617 0%,#0f172a 100%)',card:'#0f172a',ink:'#e2e8f0',accent:'#a78bfa',accentSoft:'#1e1b4b',headerBg:'linear-gradient(135deg,#8b5cf6,#6d28d9)',btnText:'#fff',shadow:'0 12px 40px rgba(0,0,0,.5)',radius:'16px',font:'Tahoma, system-ui, sans-serif'},
+    mint:{name:'نعنایی',bg:'linear-gradient(160deg,#f0fdfa 0%,#ccfbf1 100%)',card:'#ffffff',ink:'#134e4a',accent:'#0d9488',accentSoft:'#ccfbf1',headerBg:'linear-gradient(135deg,#14b8a6,#0d9488)',btnText:'#fff',shadow:'0 12px 40px rgba(13,148,136,.14)',radius:'18px',font:'Tahoma, system-ui, sans-serif'},
+    slate:{name:'سنگی',bg:'linear-gradient(160deg,#f8fafc 0%,#e2e8f0 100%)',card:'#ffffff',ink:'#1e293b',accent:'#475569',accentSoft:'#e2e8f0',headerBg:'linear-gradient(135deg,#64748b,#475569)',btnText:'#fff',shadow:'0 12px 40px rgba(71,85,105,.12)',radius:'14px',font:'Tahoma, system-ui, sans-serif'},
+    coral:{name:'مرجانی',bg:'linear-gradient(165deg,#fff5f5 0%,#fed7d7 100%)',card:'#ffffff',ink:'#742a2a',accent:'#f56565',accentSoft:'#fed7d7',headerBg:'linear-gradient(135deg,#fc8181,#e53e3e)',btnText:'#fff',shadow:'0 12px 40px rgba(245,101,101,.15)',radius:'18px',font:'Tahoma, system-ui, sans-serif'}
+  };
+  function azGetSettings(p){
+    if(!p.settings)p.settings={theme:'classic',duration:0,opensAt:'',closesAt:'',grading:'auto',shuffle:false,shuffleOptions:false,showResult:true,attempts:1,instructions:'',passScore:50,welcome:'',endMessage:'',showScoreDetail:true,oneByOne:false,requireName:false,showAnswersAfter:false,progressBar:true};
+    var d=p.settings;
+    if(!d.theme)d.theme='classic'; if(!d.grading)d.grading='auto';
+    if(d.duration==null)d.duration=0; if(d.attempts==null)d.attempts=1;
+    if(d.showResult==null)d.showResult=true; if(d.shuffle==null)d.shuffle=false;
+    if(d.shuffleOptions==null)d.shuffleOptions=false;
+    if(!d.instructions)d.instructions=''; if(d.passScore==null)d.passScore=50;
+    if(d.showScoreDetail==null)d.showScoreDetail=true;
+    if(!d.welcome)d.welcome=''; if(!d.endMessage)d.endMessage='';
+    if(d.oneByOne==null)d.oneByOne=false;
+    if(d.requireName==null)d.requireName=false;
+    if(d.showAnswersAfter==null)d.showAnswersAfter=false;
+    if(d.progressBar==null)d.progressBar=true;
+    return d;
+  }
+  function azSaveSettings(id, settings){
+    var d=load(); var p=d.projects.find(function(x){return x.id===id;});
+    if(!p)return false; p.settings=settings; p.updatedAt=now(); return save(d);
+  }
+  function azEscapeAttr(v){return esc(v==null?'':String(v));}
+  var _azRenderBuilder=renderBuilder;
+  renderBuilder=function(el,u){
+    _azRenderBuilder(el,u);
+    var p=getProj(); if(!p || p.type!=='quiz')return;
+    var st=azGetSettings(p);
+    var bar=document.createElement('section'); bar.className='card'; bar.id='azQuizSettings';
+    bar.style.cssText='margin:0 0 14px;border:1px solid var(--bd);';
+    var themeCards=Object.keys(AZ_THEMES).map(function(k){
+      var th=AZ_THEMES[k],selected=st.theme===k;
+      return '<button type="button" class="az-theme-choice" data-theme="'+k+'" aria-pressed="'+selected+'" style="text-align:right;cursor:pointer;border:2px solid '+(selected?th.accent:'var(--bd)')+';border-radius:14px;padding:8px;background:'+th.bg+';color:'+th.ink+';min-width:0;box-shadow:'+(selected?'0 0 0 3px '+th.accent+'44, '+th.shadow:'none')+';transition:all .15s">'+
+        '<span style="display:block;height:48px;border-radius:10px;background:'+th.card+';border-top:6px solid '+th.accent+';padding:8px;box-sizing:border-box;box-shadow:0 2px 8px rgba(0,0,0,.06)"><i style="display:block;width:48%;height:5px;border-radius:5px;background:'+th.accent+';margin:2px 0 6px"></i><i style="display:block;width:78%;height:4px;border-radius:5px;background:'+th.ink+';opacity:.3"></i><i style="display:block;width:55%;height:4px;border-radius:5px;background:'+th.ink+';opacity:.18;margin-top:5px"></i></span>'+
+        '<strong style="display:block;font-size:12px;margin-top:8px;font-weight:700">'+th.name+(selected?' ✓':'')+'</strong></button>';
+    }).join('');
+    bar.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><div><strong>تنظیمات آزمون</strong><div class="pd">زمان، ظاهر، شیوه تصحیح و دسترسی شرکت‌کنندگان</div></div></div>'+ 
+      '<div style="margin-top:14px"><label style="display:block;margin-bottom:8px;font-weight:700">یک تم را انتخاب کن</label><div id="azThemeGallery" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(105px,1fr));gap:9px">'+themeCards+'</div><select id="azTheme" style="display:none" aria-hidden="true">'+Object.keys(AZ_THEMES).map(function(k){return '<option value="'+k+'" '+(st.theme===k?'selected':'')+'>'+AZ_THEMES[k].name+'</option>';}).join('')+'</select></div>'+
+      '<div class="grid g2" style="margin-top:14px">'+
+      '<div class="fg"><label>مدت آزمون (دقیقه؛ صفر یعنی بدون محدودیت)</label><input id="azDuration" type="number" min="0" max="600" value="'+st.duration+'"></div>'+
+      '<div class="fg"><label>شروع شرکت در آزمون</label><input id="azOpens" type="datetime-local" value="'+azEscapeAttr(st.opensAt)+'"></div>'+
+      '<div class="fg"><label>پایان مهلت شرکت</label><input id="azCloses" type="datetime-local" value="'+azEscapeAttr(st.closesAt)+'"></div>'+
+      '<div class="fg"><label>روش تصحیح</label><select id="azGrading"><option value="auto" '+(st.grading==='auto'?'selected':'')+'>خودکار (با کلید پاسخ)</option><option value="manual" '+(st.grading==='manual'?'selected':'')+'>دستی توسط سازنده</option><option value="mixed" '+(st.grading==='mixed'?'selected':'')+'>ترکیبی (خودکار + بررسی دستی)</option></select></div>'+
+      '<div class="fg"><label>حداکثر دفعات شرکت در همین مرورگر</label><input id="azAttempts" type="number" min="1" max="20" value="'+st.attempts+'"></div>'+
+      '<div class="fg"><label>حد نصاب قبولی (%)</label><input id="azPass" type="number" min="0" max="100" value="'+st.passScore+'"></div>'+
+      '<div class="fg"><label>دستورالعمل آزمون</label><textarea id="azInstructions" rows="2">'+esc(st.instructions)+'</textarea></div></div>'+
+      '<div style="display:flex;gap:16px;flex-wrap:wrap;margin:8px 0">'+
+      '<label><input id="azShuffle" type="checkbox" '+(st.shuffle?'checked':'')+'> جابه‌جایی تصادفی سؤال‌ها</label>'+
+      '<label><input id="azShuffleOpts" type="checkbox" '+(st.shuffleOptions?'checked':'')+'> جابه‌جایی تصادفی گزینه‌ها</label>'+
+      '<label><input id="azShow" type="checkbox" '+(st.showResult?'checked':'')+'> نمایش نتیجه پس از پایان</label>'+
+      '<label><input id="azScoreDetail" type="checkbox" '+(st.showScoreDetail?'checked':'')+'> نمایش جزئیات نمره</label>'+
+      '<label><input id="azOneByOne" type="checkbox" '+(st.oneByOne?'checked':'')+'> نمایش یک سؤال در هر صفحه</label>'+
+      '<label><input id="azRequireName" type="checkbox" '+(st.requireName?'checked':'')+'> دریافت نام شرکت‌کننده قبل از شروع</label>'+
+      '<label><input id="azShowAns" type="checkbox" '+(st.showAnswersAfter?'checked':'')+'> نمایش پاسخ‌های صحیح بعد از پایان</label>'+
+      '<label><input id="azProgress" type="checkbox" '+(st.progressBar!==false?'checked':'')+'> نوار پیشرفت</label>'+
+      '</div>'+
+      '<div class="fg"><label>پیام خوش‌آمدگویی (قبل از شروع)</label><textarea id="azWelcome" rows="2" placeholder="متن کوتاه برای صفحه شروع آزمون">'+esc(st.welcome||'')+'</textarea></div>'+
+      '<div class="fg"><label>پیام پایان آزمون</label><textarea id="azEndMsg" rows="2" placeholder="متن بعد از ثبت پاسخ">'+esc(st.endMessage||'')+'</textarea></div>'+
+      '<button type="button" class="btn btn-p" id="azSaveSettings">ذخیره تنظیمات آزمون</button> <span id="azSaved" style="font-size:12px;margin-right:10px;color:var(--ok)"></span>';
+    var head=el.querySelector('.bld'); if(head)el.insertBefore(bar,head); else el.appendChild(bar);
+    function highlightTheme(){
+      var val=document.getElementById('azTheme').value;
+      Array.prototype.forEach.call(document.querySelectorAll('.az-theme-choice'),function(btn){
+        var on=btn.getAttribute('data-theme')===val;
+        btn.setAttribute('aria-pressed',on?'true':'false');
+        btn.style.borderColor=on?(AZ_THEMES[btn.getAttribute('data-theme')].accent):'var(--bd)';
+        btn.style.boxShadow=on?'0 0 0 2px '+AZ_THEMES[btn.getAttribute('data-theme')].accent+'33':'none';
+      });
+    }
+    document.getElementById('azThemeGallery').addEventListener('click',function(e){
+      var b=e.target.closest('[data-theme]');if(!b)return;
+      document.getElementById('azTheme').value=b.getAttribute('data-theme');
+      highlightTheme();
+    });
+    document.getElementById('azTheme').onchange=highlightTheme;
+    highlightTheme();
+    document.getElementById('azSaveSettings').onclick=function(){
+      var settings={
+        theme:document.getElementById('azTheme').value,
+        duration:Math.max(0,Math.min(600,Number(document.getElementById('azDuration').value)||0)),
+        opensAt:document.getElementById('azOpens').value,
+        closesAt:document.getElementById('azCloses').value,
+        grading:document.getElementById('azGrading').value,
+        attempts:Math.max(1,Math.min(20,Number(document.getElementById('azAttempts').value)||1)),
+        passScore:Math.max(0,Math.min(100,Number(document.getElementById('azPass').value)||0)),
+        instructions:document.getElementById('azInstructions').value,
+        shuffle:document.getElementById('azShuffle').checked,
+        shuffleOptions:document.getElementById('azShuffleOpts')?document.getElementById('azShuffleOpts').checked:false,
+        showResult:document.getElementById('azShow').checked,
+        showScoreDetail:document.getElementById('azScoreDetail')?document.getElementById('azScoreDetail').checked:true,
+        oneByOne:document.getElementById('azOneByOne')?document.getElementById('azOneByOne').checked:false,
+        requireName:document.getElementById('azRequireName')?document.getElementById('azRequireName').checked:false,
+        showAnswersAfter:document.getElementById('azShowAns')?document.getElementById('azShowAns').checked:false,
+        progressBar:document.getElementById('azProgress')?document.getElementById('azProgress').checked:true,
+        welcome:document.getElementById('azWelcome')?document.getElementById('azWelcome').value:'',
+        endMessage:document.getElementById('azEndMsg')?document.getElementById('azEndMsg').value:''
+      };
+      if(settings.opensAt && settings.closesAt && new Date(settings.closesAt)<=new Date(settings.opensAt)){toast('زمان پایان باید بعد از زمان شروع باشد.','er');return;}
+      if(azSaveSettings(p.id,settings)){document.getElementById('azSaved').textContent='ذخیره شد ✓';toast('تنظیمات آزمون ذخیره شد','ok');}
+    };
+  };
+  var _azDrawProps=drawProps;
+  drawProps=function(){
+    _azDrawProps(); var p=getProj(); if(!p||p.type!=='quiz')return;
+    var f=(p.fields||[]).find(function(x){return x.id===state.selectedField;}); if(!f)return;
+    var box=document.getElementById('props'); if(!box)return;
+    var canAnswer=['select','radio','checkbox','text','textarea','number'].indexOf(f.type)>=0;
+    if(!canAnswer)return;
+    var keyHtml='<div style="border-top:1px solid var(--bd);margin-top:12px;padding-top:12px"><strong>نمره و پاسخ صحیح</strong><div class="fg"><label>نمره این سؤال</label><input id="azPoints" type="number" min="0" max="100" value="'+(f.points==null?1:f.points)+'"></div>';
+    if(f.type==='select'||f.type==='radio')keyHtml+='<div class="fg"><label>پاسخ صحیح</label><select id="azCorrect"><option value="">انتخاب پاسخ صحیح</option>'+(f.options||[]).map(function(o){return '<option value="'+azEscapeAttr(o)+'" '+(f.correctAnswer===o?'selected':'')+'>'+esc(o)+'</option>';}).join('')+'</select></div>';
+    else if(f.type==='checkbox')keyHtml+='<div class="fg"><label>پاسخ‌های صحیح (هر خط یک گزینه)</label><textarea id="azCorrect" rows="3">'+esc((f.correctAnswers||[]).join('\n'))+'</textarea></div>';
+    else keyHtml+='<div class="fg"><label>پاسخ صحیح دقیق</label><input id="azCorrect" value="'+azEscapeAttr(f.correctAnswer||'')+'" placeholder="پاسخ مورد انتظار"></div>';
+    keyHtml+='<div style="font-size:11px;color:var(--mu)">در تصحیح خودکار، پاسخ‌ها باید با کلید بالا مطابقت داشته باشند. برای سؤال تشریحی، تصحیح دستی مناسب‌تر است.</div></div>';
+    box.insertAdjacentHTML('beforeend',keyHtml);
+    var pts=document.getElementById('azPoints'),cor=document.getElementById('azCorrect');
+    function saveKey(){var fresh=getProj();if(!fresh)return;var fs=(fresh.fields||[]).map(function(x){if(x.id!==f.id)return x;var z=Object.assign({},x);z.points=Math.max(0,Number(pts.value)||0);if(z.type==='checkbox')z.correctAnswers=cor.value.split('\n').map(function(v){return v.trim();}).filter(Boolean);else z.correctAnswer=cor.value;return z;});saveFields(fs);}
+    pts.onchange=saveKey;cor.onchange=saveKey;
+  };
+  function azNormalize(v){return String(v==null?'':v).trim().toLocaleLowerCase('fa-IR').replace(/\s+/g,' ');}
+  function azGrade(p,answers){var total=0,score=0,manual=[];(p.fields||[]).forEach(function(f){var pts=Number(f.points==null?1:f.points)||0;total+=pts;if(f.type==='checkbox' && (!Array.isArray(f.correctAnswers)||!f.correctAnswers.length)){manual.push(f.id);return;}if(f.type!=='checkbox' && (f.correctAnswer==null||String(f.correctAnswer)==='')){manual.push(f.id);return;}var a=answers[f.id]||'';var ok=false;if(f.type==='checkbox'){var x=String(a).split(',').map(azNormalize).sort().join('|'),y=(f.correctAnswers||[]).map(azNormalize).sort().join('|');ok=x===y;}else ok=azNormalize(a)===azNormalize(f.correctAnswer);if(ok)score+=pts;});return {score:score,total:total,manual:manual};}
+  /* بازنویسی صفحه شرکت: زمان‌بندی، تم، محدودیت زمان، نمره و ثبت واقعی در پایگاه محلی */
+  tryPublic=function(){
+    var params=new URLSearchParams(location.search),fid=params.get('f');if(!fid)return false;
+    document.getElementById('auth').style.display='none';document.getElementById('app').classList.remove('on');var view=document.getElementById('public');view.classList.add('on');
+    var db=load(),p=db.projects.find(function(x){return x.publicId===fid;});
+    if(!p){view.innerHTML='<div class="pubc"><div class="empty">آزمون یا فرم پیدا نشد.</div></div>';return true;}
+    if(p.status!=='published'){view.innerHTML='<div class="pubc"><div class="empty">این آزمون در حال حاضر منتشر نشده است.</div></div>';return true;}
+    var st=azGetSettings(p),current=new Date(),opens=st.opensAt?new Date(st.opensAt):null,closes=st.closesAt?new Date(st.closesAt):null;
+    if(opens && current<opens){view.innerHTML='<div class="pubc"><div class="empty">زمان شروع آزمون هنوز نرسیده است.<br>شروع: '+faDate(opens.toISOString())+'</div></div>';return true;}
+    if(closes && current>closes){view.innerHTML='<div class="pubc"><div class="empty">مهلت شرکت در آزمون به پایان رسیده است.</div></div>';return true;}
+    var attemptKey='az_attempt_'+fid,attempts=0;try{attempts=Number(localStorage.getItem(attemptKey)||0);}catch(e){}
+    if(p.type==='quiz'&&attempts>=st.attempts){view.innerHTML='<div class="pubc"><div class="empty">تعداد دفعات مجاز شرکت در این آزمون استفاده شده است.</div></div>';return true;}
+    var fields=(p.fields||[]).slice().map(function(f){return JSON.parse(JSON.stringify(f));});
+    if(st.shuffle)fields.sort(function(){return Math.random()-.5;});
+    if(st.shuffleOptions){
+      fields.forEach(function(f){
+        if(f.options&&f.options.length>1){
+          f.options=f.options.slice().sort(function(){return Math.random()-.5;});
+        }
+      });
+    }
+    var th=AZ_THEMES[st.theme]||AZ_THEMES.classic;
+    var headerBg=th.headerBg||th.accent;
+    var participantName='';
+    var qIndex=0;
+    var answersCache={};
+    var started=null,interval=null,submitted=false;
+
+    function wrapShell(inner){
+      return '<div id="pubCard" style="min-height:100vh;padding:20px 14px 40px;background:'+th.bg+';color:'+th.ink+';font-family:'+(th.font||'Tahoma,system-ui,sans-serif')+';direction:rtl;box-sizing:border-box"><div style="max-width:780px;margin:0 auto;background:'+th.card+';color:'+th.ink+';border-radius:'+(th.radius||'16px')+';box-shadow:'+(th.shadow||'0 12px 40px rgba(0,0,0,.1)')+';overflow:hidden">'+inner+'</div></div>';
+    }
+    function headerBlock(extra){
+      return '<div style="background:'+headerBg+';color:'+(th.btnText||'#fff')+';padding:22px 24px"><h1 style="font-size:22px;font-weight:900;margin:0 0 8px">'+esc(p.title)+'</h1>'+
+        (st.instructions||p.description?'<div style="white-space:pre-wrap;opacity:.92;font-size:14px;line-height:1.6">'+esc(st.instructions||p.description||'')+'</div>':'')+
+        (extra||'')+'</div>';
+    }
+    function renderQ(f,i){
+      var img=f.imageData?'<img src="'+f.imageData+'" alt="" style="display:block;max-width:100%;max-height:240px;object-fit:contain;margin:10px 0;border-radius:12px">':'';
+      return '<div class="pf az-q-item" data-qi="'+i+'" style="padding:16px 0;border-bottom:1px solid '+(th.ink==='#f1f5f9'||th.ink==='#e2e8f0'?'#334155':'#e2e8f0')+'"><label style="display:block;margin-bottom:10px;font-weight:700;font-size:15px;line-height:1.55">'+(i+1)+'. '+esc(f.label)+(f.required?' <span style="color:#ef4444">*</span>':'')+(f.points!=null?' <span style="font-size:12px;opacity:.65">('+f.points+' نمره)</span>':'')+'</label>'+img+publicField(f)+'</div>';
+    }
+    function progressHtml(cur,total){
+      if(st.progressBar===false)return '';
+      var pct=total?Math.round((cur/total)*100):0;
+      return '<div style="padding:10px 24px 0"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px;opacity:.8"><span>پیشرفت</span><span>'+cur+' / '+total+'</span></div><div style="height:8px;background:'+(th.accentSoft||'#e2e8f0')+';border-radius:99px;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:'+th.accent+';border-radius:99px;transition:width .25s"></div></div></div>';
+    }
+    function startTimer(){
+      if(!st.duration)return;
+      started=Date.now();
+      interval=setInterval(function(){
+        var remaining=Math.max(0,st.duration*60-Math.floor((Date.now()-started)/1000));
+        var tm=document.getElementById('azTimer');
+        if(tm)tm.textContent='⏱ زمان باقی‌مانده: '+Math.floor(remaining/60)+':'+String(remaining%60).padStart(2,'0');
+        if(remaining<=0){clearInterval(interval);toast('زمان آزمون به پایان رسید.','er');finishQuiz(true);}
+      },1000);
+    }
+    function collectFromForm(form){
+      fields.forEach(function(f){
+        if(f.type==='title'||f.type==='note')return;
+        if(f.type==='checkbox'){
+          answersCache[f.id]=Array.prototype.slice.call(form.querySelectorAll('input[name="'+f.id+'"]:checked')).map(function(x){return x.value;}).join(', ');
+        }else{
+          var inp=form.elements[f.id];
+          answersCache[f.id]=inp?inp.value:'';
+        }
+      });
+    }
+    function finishQuiz(autoEnd){
+      if(submitted)return;
+      var form=document.getElementById('pubForm');
+      if(form)collectFromForm(form);
+      if(!autoEnd&&form&&!form.reportValidity())return;
+      submitted=true;
+      if(interval)clearInterval(interval);
+      var answers=answersCache;
+      var grade=p.type==='quiz'&&st.grading!=='manual'?azGrade(p,answers):null;
+      var response={id:uid(),projectId:p.id,answers:answers,at:now(),participantName:participantName||'',gradingStatus:st.grading==='manual'?'در انتظار تصحیح':(grade&&grade.manual.length?'نیازمند بررسی دستی':'تصحیح خودکار'),score:grade?grade.score:null,total:grade?grade.total:null,manualFields:grade?grade.manual:[]};
+      var d=load();d.responses.push(response);save(d);
+      if(p.type==='quiz'){try{localStorage.setItem(attemptKey,String(attempts+1));}catch(e){}}
+      var percent=grade&&grade.total?Math.round(grade.score/grade.total*100):0;
+      var passed=grade&&grade.total?percent>=st.passScore:false;
+      var msg='<div style="padding:36px 24px;text-align:center">'+
+        '<div style="font-size:48px;margin-bottom:8px">'+(p.type==='quiz'&&st.showResult&&grade?(passed?'🏆':'📋'):'✓')+'</div>'+
+        '<h2 style="font-size:22px;margin-bottom:8px">پاسخ شما ثبت شد</h2>';
+      if(participantName)msg+='<p style="opacity:.8">'+esc(participantName)+'</p>';
+      if(p.type==='quiz'&&st.showResult&&grade&&st.grading!=='manual'){
+        msg+='<div style="margin:18px auto;max-width:280px;padding:16px;border-radius:14px;background:'+(th.accentSoft||'#f1f5f9')+'"><div style="font-size:28px;font-weight:900;color:'+th.accent+'">'+grade.score+' / '+grade.total+'</div><div style="font-size:14px;margin-top:4px">'+percent+'٪</div><div style="margin-top:8px;font-weight:700">'+(passed?'حد نصاب قبولی کسب شد ✓':'حد نصاب قبولی کسب نشد')+'</div></div>';
+        if(grade.manual.length)msg+='<p style="font-size:13px;opacity:.8">برخی سؤال‌ها نیازمند بررسی دستی هستند.</p>';
+      }else if(p.type==='quiz'){
+        msg+='<p style="opacity:.85">'+(st.grading==='manual'?'نتیجه پس از تصحیح سازنده اعلام می‌شود.':'نتیجه ثبت شد.')+'</p>';
+      }
+      if(st.endMessage)msg+='<p style="margin-top:12px;white-space:pre-wrap">'+esc(st.endMessage)+'</p>';
+      else msg+='<p style="margin-top:12px;opacity:.75">از شرکت شما سپاسگزاریم.</p>';
+      if(st.showAnswersAfter&&p.type==='quiz'&&grade){
+        msg+='<div style="text-align:right;margin-top:24px;padding-top:16px;border-top:1px solid '+(th.ink==='#f1f5f9'||th.ink==='#e2e8f0'?'#334155':'#e2e8f0')+'"><strong>پاسخ‌های صحیح:</strong>';
+        fields.forEach(function(f,i){
+          if(f.type==='title'||f.type==='note')return;
+          var correct=f.type==='checkbox'?(f.correctAnswers||[]).join('، '):(f.correctAnswer||'—');
+          var userAns=answers[f.id]||'—';
+          msg+='<div style="margin:10px 0;font-size:13px"><b>'+(i+1)+'. '+esc(f.label)+'</b><br>پاسخ شما: '+esc(String(userAns))+'<br>پاسخ صحیح: '+esc(String(correct))+'</div>';
+        });
+        msg+='</div>';
+      }
+      msg+='</div>';
+      view.innerHTML=wrapShell(headerBlock()+'<div>'+msg+'</div>');
+    }
+    function showExam(){
+      var timerBit=st.duration?'<div id="azTimer" style="display:inline-flex;margin-top:12px;background:rgba(255,255,255,.22);padding:7px 14px;border-radius:999px;font-weight:800;font-size:14px">⏱ زمان باقی‌مانده: '+st.duration+':00</div>':'';
+      if(st.oneByOne&&fields.length){
+        qIndex=0;
+        function paintOne(){
+          var f=fields[qIndex];
+          var body=progressHtml(qIndex+1,fields.length)+'<div style="padding:22px 24px"><form id="pubForm">'+renderQ(f,qIndex)+
+            '<div style="margin-top:22px;display:flex;gap:8px;flex-wrap:wrap">'+
+            (qIndex>0?'<button type="button" class="btn btn-s" id="azPrevQ">سؤال قبلی</button>':'')+
+            (qIndex<fields.length-1?'<button type="button" class="btn btn-p" id="azNextQ" style="background:'+th.accent+';color:'+(th.btnText||'#fff')+';border:none">سؤال بعدی</button>':
+            '<button type="submit" class="btn btn-p" style="background:'+th.accent+';color:'+(th.btnText||'#fff')+';border:none;padding:12px 22px;border-radius:12px;font-weight:700">ثبت نهایی</button>')+
+            '</div></form></div>';
+          view.innerHTML=wrapShell(headerBlock(timerBit)+body);
+          var form=document.getElementById('pubForm');
+          // restore cached answer
+          var cached=answersCache[f.id];
+          if(cached!=null&&form){
+            if(f.type==='checkbox'){
+              String(cached).split(', ').forEach(function(v){
+                Array.prototype.forEach.call(form.querySelectorAll('input[name="'+f.id+'"]'),function(el){if(el.value===v)el.checked=true;});
+              });
+            }else if(form.elements[f.id])form.elements[f.id].value=cached;
+          }
+          var next=document.getElementById('azNextQ');
+          if(next)next.onclick=function(){collectFromForm(form);if(f.required){var v=answersCache[f.id];if(v==null||v===''){toast('این سؤال الزامی است','er');return;}}qIndex++;paintOne();};
+          var prev=document.getElementById('azPrevQ');
+          if(prev)prev.onclick=function(){collectFromForm(form);qIndex--;paintOne();};
+          form.onsubmit=function(e){e.preventDefault();collectFromForm(form);finishQuiz(false);};
+        }
+        paintOne();
+      }else{
+        var fieldsHtml=fields.map(function(f,i){return renderQ(f,i);}).join('');
+        view.innerHTML=wrapShell(headerBlock(timerBit)+progressHtml(fields.length,fields.length)+'<div style="padding:22px 24px"><form id="pubForm">'+fieldsHtml+
+          '<div style="margin-top:28px;padding-top:18px;border-top:1px solid '+(th.ink==='#f1f5f9'||th.ink==='#e2e8f0'?'#334155':'#e2e8f0')+'"><button type="submit" class="btn btn-p" style="background:'+th.accent+';color:'+(th.btnText||'#fff')+';border:none;padding:14px 28px;border-radius:12px;font-weight:700;cursor:pointer;box-shadow:0 4px 14px '+th.accent+'55">ثبت '+(p.type==='quiz'?'آزمون':'پاسخ')+'</button></div></form></div>');
+        document.getElementById('pubForm').onsubmit=function(e){e.preventDefault();finishQuiz(false);};
+      }
+      startTimer();
+    }
+    // Welcome / name gate
+    var needWelcome=!!(st.welcome||st.requireName);
+    if(needWelcome){
+      view.innerHTML=wrapShell(headerBlock()+
+        '<div style="padding:28px 24px">'+
+        (st.welcome?'<p style="white-space:pre-wrap;line-height:1.7;margin-bottom:16px">'+esc(st.welcome)+'</p>':'')+
+        (st.requireName?'<div class="fg"><label>نام و نام خانوادگی</label><input id="azPartName" type="text" placeholder="نام خود را وارد کنید" style="width:100%;padding:11px 13px;border:1px solid var(--bd,#e2e8f0);border-radius:10px"></div>':'')+
+        (st.duration?'<p style="font-size:13px;opacity:.8;margin:10px 0">مدت آزمون: '+st.duration+' دقیقه</p>':'')+
+        '<button type="button" id="azStartExam" class="btn btn-p" style="background:'+th.accent+';color:'+(th.btnText||'#fff')+';border:none;padding:12px 24px;border-radius:12px;font-weight:700;margin-top:8px">شروع آزمون</button></div>');
+      document.getElementById('azStartExam').onclick=function(){
+        if(st.requireName){
+          var n=document.getElementById('azPartName');
+          participantName=n?n.value.trim():'';
+          if(!participantName){toast('لطفاً نام خود را وارد کنید','er');return;}
+        }
+        showExam();
+      };
+    }else{
+      showExam();
+    }
+    return true;
+  };
+
+  /* ابزار تصحیح دستی و مشاهده وضعیت هر شرکت‌کننده */
+  var _azRenderProject=renderProject;
+  renderProject=function(el,u){
+    _azRenderProject(el,u);var p=getProj();if(!p)return;
+    // QR + share for published
+    if(p.status==='published'){
+      var link=location.href.split('?')[0]+'?f='+p.publicId;
+      var qrBox=document.createElement('div');
+      qrBox.className='card';
+      qrBox.style.marginTop='14px';
+      qrBox.innerHTML='<div class="ct">اشتراک‌گذاری و QR</div>'+
+        '<div style="display:flex;gap:16px;flex-wrap:wrap;align-items:center">'+
+        '<img alt="QR" width="140" height="140" style="border-radius:10px;background:#fff;border:1px solid var(--bd)" src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&data='+encodeURIComponent(link)+'" />'+
+        '<div style="flex:1;min-width:200px"><p style="font-size:13px;color:var(--t2);margin-bottom:8px">لینک عمومی را با QR یا کپی به اشتراک بگذارید.</p>'+
+        '<button type="button" class="btn btn-p btn-sm" id="azCopyLinkAgain">کپی لینک</button> '+
+        '<button type="button" class="btn btn-s btn-sm" id="azOpenPublic">باز کردن لینک</button></div></div>';
+      el.appendChild(qrBox);
+      var c1=document.getElementById('azCopyLinkAgain');if(c1)c1.onclick=function(){copyText(link);};
+      var c2=document.getElementById('azOpenPublic');if(c2)c2.onclick=function(){window.open(link,'_blank');};
+    }
+    if(p.type!=='quiz')return;
+    var db=load(),rs=db.responses.filter(function(r){return r.projectId===p.id;});
+    var table=el.querySelector('.card table');if(!table)return;
+    var head=table.querySelector('thead tr');if(head){var th=document.createElement('th');th.textContent='تصحیح';head.appendChild(th);}
+    var trs=table.querySelectorAll('tbody tr');
+    rs.slice().reverse().slice(0,25).forEach(function(r,i){var tr=trs[i];if(!tr)return;var td=document.createElement('td');var status=r.gradingStatus||'ثبت‌شده';var who=r.participantName?' · '+esc(r.participantName):'';td.innerHTML='<span style="font-size:11px">'+esc(status)+who+'</span> <button type="button" class="btn btn-s btn-sm" data-grade="'+r.id+'">'+(status==='تصحیح‌شده'?'مشاهده/ویرایش':'تصحیح')+'</button>';tr.appendChild(td);});
+    Array.prototype.forEach.call(el.querySelectorAll('[data-grade]'),function(btn){btn.onclick=function(){azOpenManualGrade(p.id,btn.getAttribute('data-grade'));};});
+  };
+  function azOpenManualGrade(projectId,responseId){
+    var d=load(),p=d.projects.find(function(x){return x.id===projectId;}),r=d.responses.find(function(x){return x.id===responseId;});if(!p||!r)return;
+    var html='<h3>تصحیح پاسخ آزمون</h3><p style="font-size:12px;color:var(--mu)">'+esc(p.title)+' · '+faDate(r.at)+'</p><div style="max-height:55vh;overflow:auto">';
+    (p.fields||[]).forEach(function(f,i){var max=Number(f.points==null?1:f.points)||0;var ans=r.answers?r.answers[f.id]:'';html+='<div class="fg" style="border-bottom:1px solid var(--bd);padding:8px 0"><strong>'+ (i+1)+'. '+esc(f.label)+'</strong><div style="font-size:13px;margin:5px 0;white-space:pre-wrap">پاسخ: '+esc(Array.isArray(ans)?ans.join('، '):ans||'—')+'</div><label>نمره کسب‌شده (از '+max+')</label><input type="number" min="0" max="'+max+'" step="0.25" data-manual-points="'+f.id+'" value="'+(r.manualMarks&&r.manualMarks[f.id]!=null?r.manualMarks[f.id]:(r.manualFields&&r.manualFields.indexOf(f.id)<0&&r.score!=null?max:0))+'"></div>';});
+    html+='</div><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px"><button type="button" class="btn btn-p" id="azSaveManual">ذخیره تصحیح</button><button type="button" class="btn btn-s" id="azCancelManual">انصراف</button></div>';
+    openModal(html);document.getElementById('azCancelManual').onclick=closeModal;
+    document.getElementById('azSaveManual').onclick=function(){var marks={},sum=0,total=0;Array.prototype.forEach.call(document.querySelectorAll('[data-manual-points]'),function(inp){var id=inp.getAttribute('data-manual-points'),f=p.fields.find(function(x){return x.id===id;}),max=f?Number(f.points==null?1:f.points)||0:0,v=Math.max(0,Math.min(max,Number(inp.value)||0));marks[id]=v;sum+=v;total+=max;});
+      var fresh=load(),target=fresh.responses.find(function(x){return x.id===responseId;});if(!target)return;target.manualMarks=marks;target.score=sum;target.total=total;target.gradingStatus='تصحیح‌شده';target.gradedAt=now();save(fresh);closeModal();toast('تصحیح ذخیره شد','ok');render();};
+  }
+
+  /* اگر صفحه با لینک آزمون باز شده، نسخه زمان‌بندی‌شده را دوباره اعمال کن. */
+  if(new URLSearchParams(location.search).get('f'))tryPublic();
+
+  /* مسیر ساده و سازگار با موبایل: فرم ساخت داخل صفحه، بدون focus خودکار */
+  openCreate = function(forceType){
+    var content=document.getElementById('content');
+    if(!content)return;
+    var old=document.getElementById('azCreatePanel');
+    if(old)old.remove();
+    var preferred=forceType || (state.page==='quizzes'?'quiz':state.page==='forms'?'form':'form');
+    var panel=document.createElement('section');
+    panel.id='azCreatePanel';
+    panel.className='card';
+    panel.style.cssText='margin:0 0 18px;padding:18px;border:2px solid var(--p);position:relative;z-index:2;';
+    panel.innerHTML=
+      '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px;flex-wrap:wrap">'+
+        '<h3 style="font-size:17px;font-weight:800">'+(preferred==='quiz'?'ساخت آزمون جدید':'ساخت پروژه جدید')+'</h3>'+
+        '<button type="button" class="btn btn-s btn-sm" id="azCreateCancel">بستن</button></div>'+
+      '<div class="fg"><label for="azCreateTitle">عنوان پروژه</label><input id="azCreateTitle" type="text" autocomplete="off" placeholder="مثلاً آزمون فصل اول"></div>'+
+      '<div class="fg"><label for="azCreateType">نوع</label><select id="azCreateType">'+
+        '<option value="form" '+(preferred==='form'?'selected':'')+'>فرم</option>'+
+        '<option value="quiz" '+(preferred==='quiz'?'selected':'')+'>آزمون</option>'+
+        '<option value="survey">نظرسنجی</option></select></div>'+
+      '<div class="fg"><label for="azCreateDesc">توضیحات (اختیاری)</label><textarea id="azCreateDesc" rows="2" placeholder="توضیح کوتاه"></textarea></div>'+
+      '<div style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="btn btn-p" id="azCreateSubmit" style="width:auto">ایجاد و ورود به ویرایشگر</button></div>';
+    content.insertBefore(panel,content.firstChild);
+    panel.scrollIntoView({behavior:'smooth',block:'start'});
+  };
+
+  function azCreateProject(){
+    var titleNode=document.getElementById('azCreateTitle');
+    var typeNode=document.getElementById('azCreateType');
+    var descNode=document.getElementById('azCreateDesc');
+    var title=titleNode?titleNode.value.trim():'';
+    if(!title){toast('لطفاً عنوان پروژه را وارد کنید.','er');return;}
+    var current=user();
+    if(!current){toast('نشست کاربری پیدا نشد؛ یک‌بار خارج و دوباره وارد شوید.','er');return;}
+    var db=load();
+    if(!Array.isArray(db.projects))db.projects=[];
+    if(!Array.isArray(db.notifs))db.notifs=[];
+    var type=typeNode?typeNode.value:'form';
+    var stamp=now();
+    var project={id:uid(),ownerId:current.id,title:title,type:type,description:descNode?descNode.value.trim():'',status:'draft',fields:[],settings:type==='quiz'?{theme:'classic',duration:0,opensAt:'',closesAt:'',grading:'auto',shuffle:false,showResult:true,attempts:1,instructions:'',passScore:50}:undefined,publicId:uid().slice(0,10),createdAt:stamp,updatedAt:stamp};
+    db.projects.push(project);
+    db.notifs.push({id:uid(),userId:current.id,title:type==='quiz'?'آزمون ساخته شد':'پروژه ساخته شد',body:'«'+title+'» ساخته شد.',read:false,at:stamp});
+    if(!save(db)){toast('ذخیره پروژه انجام نشد.','er');return;}
+    state.builderId=project.id;
+    state.selectedField=null;
+    toast(type==='quiz'?'آزمون ساخته شد':'پروژه ساخته شد','ok');
+    go('builder');
+  }
+
+  /* رویدادگیری واحد؛ از اجرای چندباره کلیک‌هندلرهای قدیمی جلوگیری می‌کند. */
+  document.addEventListener('click',function(e){
+    var t=e.target&&e.target.closest?e.target.closest('#btnNew,#dashNew,#listNew,#azCreateCancel,#azCreateSubmit'):null;
+    if(!t)return;
+    e.preventDefault();
+    e.stopPropagation();
+    if(e.stopImmediatePropagation)e.stopImmediatePropagation();
+    if(t.id==='btnNew'||t.id==='dashNew'||t.id==='listNew'){
+      var kind=state.page==='quizzes'?'quiz':state.page==='forms'?'form':null;
+      openCreate(kind);
+    }else if(t.id==='azCreateCancel'){
+      var panel=document.getElementById('azCreatePanel');if(panel)panel.remove();
+    }else if(t.id==='azCreateSubmit'){
+      azCreateProject();
+    }
+  },true);
+
+})();
+</script>
+</body>
+</html>
